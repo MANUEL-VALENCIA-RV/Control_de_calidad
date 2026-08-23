@@ -4,8 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { Request } from 'express';
+import { IS_PUBLIC_KEY } from './public.decorator';
 
 const SESSION_COOKIE = 'cc_session';
 
@@ -13,7 +15,7 @@ const SESSION_COOKIE = 'cc_session';
 export class SessionGuard implements CanActivate {
   private readonly secret: string;
 
-  constructor() {
+  constructor(private readonly reflector: Reflector) {
     const secret = process.env.AUTH_SECRET;
 
     if (!secret) {
@@ -26,14 +28,21 @@ export class SessionGuard implements CanActivate {
   }
 
   canActivate(context: ExecutionContext): boolean {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractToken(request);
     const email = token ? this.verify(token) : null;
 
     if (!email) {
-      throw new UnauthorizedException(
-        'Sesión no válida o expirada',
-      );
+      throw new UnauthorizedException('Sesión no válida o expirada');
     }
 
     (
@@ -55,14 +64,10 @@ export class SessionGuard implements CanActivate {
     const cookie = (request.headers.cookie ?? '')
       .split(';')
       .map((part) => part.trim())
-      .find((part) =>
-        part.startsWith(`${SESSION_COOKIE}=`)
-      );
+      .find((part) => part.startsWith(`${SESSION_COOKIE}=`));
 
     return cookie
-      ? decodeURIComponent(
-          cookie.slice(SESSION_COOKIE.length + 1)
-        )
+      ? decodeURIComponent(cookie.slice(SESSION_COOKIE.length + 1))
       : null;
   }
 
@@ -80,9 +85,7 @@ export class SessionGuard implements CanActivate {
 
     const payload = `${email}|${expStr}`;
 
-    const expected = Buffer.from(
-      this.sign(payload)
-    );
+    const expected = Buffer.from(this.sign(payload));
 
     const received = Buffer.from(signature);
 
@@ -97,8 +100,6 @@ export class SessionGuard implements CanActivate {
   }
 
   private sign(payload: string): string {
-    return createHmac('sha256', this.secret)
-      .update(payload)
-      .digest('hex');
+    return createHmac('sha256', this.secret).update(payload).digest('hex');
   }
 }

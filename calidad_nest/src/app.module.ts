@@ -4,14 +4,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportesModule } from './reportes/reportes.module';
 import { SessionGuard } from './auth/session.guard';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [
-    ReportesModule,
-  ],
-  controllers: [
-    AppController,
-  ],
+  imports: [PrismaModule, ReportesModule],
+  controllers: [AppController],
   providers: [
     AppService,
     {
