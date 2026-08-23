@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (los .env.example sí se comparten)
+.env
+.env.*
+!.env.example
+
+# Configuración local de asistentes / editores
+.claude/
+.windsurf/
+.agents/
+.cursor/
+AGENTS.md
+CLAUDE.md
+
+# Builds y artefactos
+.next/
+dist/
+tsconfig.tsbuildinfo
+*.log

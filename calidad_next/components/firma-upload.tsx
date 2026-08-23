@@ -1,0 +1,70 @@
+"use client";
+import { ChangeEvent, useRef, useState } from "react";
+import { Check, LoaderCircle, PenLine, Trash2 } from "lucide-react";
+import { deleteFirma } from "@/lib/reports";
+import type { ReportRow } from "@/lib/reports";
+
+export function FirmaUpload({ folio, firma, onUpdated }: { folio: string; firma: string; onUpdated: (oldFolio: string, row: ReportRow) => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function change(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLoading(true); setError("");
+    try {
+      const fd = new FormData(); fd.append("file", file);
+      const res = await fetch(`/api/reportes/${encodeURIComponent(folio)}/firma`, { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || data?.message || "No se pudo subir la firma");
+      onUpdated(folio, data as ReportRow);
+    } catch (err) { setError(err instanceof Error ? err.message : "Error al subir firma"); } finally { setLoading(false); if (inputRef.current) inputRef.current.value = ""; }
+  }
+
+  async function remove() {
+    setLoading(true); setError("");
+    try {
+      const row = await deleteFirma(folio) as ReportRow;
+      onUpdated(folio, row);
+    }
+    catch (err) { setError(err instanceof Error ? err.message : "Error al eliminar firma"); }
+    finally { setLoading(false); }
+  }
+
+  return (
+    <div className="group/firma flex items-center gap-1">
+      {firma ? (
+        <span className="flex items-center gap-1 text-[11px] text-green-400">
+          <Check className="size-3" />
+          Firmado
+        </span>
+      ) : (
+        <span className="text-[11px] text-muted-foreground">Sin firma</span>
+      )}
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={change} />
+      {firma ? (
+        <button
+          type="button"
+          disabled={loading}
+          onClick={remove}
+          className="shrink-0 rounded p-0.5 text-muted-foreground/0 transition-colors hover:bg-destructive/20 hover:text-destructive group-hover/firma:text-muted-foreground"
+          aria-label="Eliminar firma"
+        >
+          {loading ? <LoaderCircle className="size-3 animate-spin" /> : <Trash2 className="size-3" />}
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => inputRef.current?.click()}
+          className="shrink-0 rounded p-0.5 text-muted-foreground/0 transition-colors hover:bg-white/10 hover:text-foreground group-hover/firma:text-muted-foreground"
+          aria-label="Subir firma"
+        >
+          {loading ? <LoaderCircle className="size-3 animate-spin" /> : <PenLine className="size-3" />}
+        </button>
+      )}
+      {error && <span className="max-w-32 text-[10px] text-destructive">{error}</span>}
+    </div>
+  );
+}

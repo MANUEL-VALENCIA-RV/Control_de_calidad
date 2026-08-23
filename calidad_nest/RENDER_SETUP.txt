@@ -1,0 +1,54 @@
+CALIDAD_NEST - CONFIGURACION PARA RENDER
+
+Root Directory:
+  calidad_nest
+
+Build Command:
+  pnpm build
+
+Start Command:
+  pnpm start:prod
+
+VARIABLES OBLIGATORIAS EN RENDER:
+  DATABASE_URL=<URL de Neon/PostgreSQL>
+  AUTH_SECRET=<MISMO secreto usado por Next.js para cc_session>
+  CORS_ORIGINS=https://control-de-calidad-calidad-next.vercel.app
+
+GOOGLE DRIVE:
+  GOOGLE_CLIENT_ID=<OAuth Client ID>
+  GOOGLE_CLIENT_SECRET=<OAuth Client Secret>
+  GOOGLE_REFRESH_TOKEN=<refresh token generado por scripts/get-refresh-token.mjs>
+  GOOGLE_DRIVE_FOLDER_ID=<ID de la carpeta de Drive>
+  GOOGLE_REDIRECT_URI=http://localhost:8080
+
+IMPORTANTE EN GOOGLE CLOUD:
+  1. Google Drive API debe estar habilitada.
+  2. Debes tener un OAuth 2.0 Client ID.
+  3. En Authorized redirect URIs debe existir exactamente:
+       http://localhost:8080
+  4. La cuenta usada para generar GOOGLE_REFRESH_TOKEN debe tener acceso a la carpeta indicada por GOOGLE_DRIVE_FOLDER_ID.
+
+PORT:
+  Render lo proporciona automaticamente. No necesitas fijarlo manualmente.
+
+FRONTEND EN VERCEL:
+  NEST_API_URL=https://TU-SERVICIO-DE-RENDER.onrender.com
+  AUTH_SECRET=<MISMO valor que en Render/Nest>
+
+SUBIDA DE ARCHIVOS:
+  POST /reportes/:folio/evidencias
+  Content-Type: multipart/form-data
+  Campo del archivo: file
+  Maximo: 10 MB
+  Solo MIME image/*
+
+FIRMA:
+  POST /reportes/:folio/firma
+  Content-Type: multipart/form-data
+  Campo del archivo: file
+
+Si Render muestra:
+  invalid_grant -> refresh token invalido/revocado o OAuth mal configurado.
+  File not found -> GOOGLE_DRIVE_FOLDER_ID incorrecto o la cuenta no tiene acceso.
+  Google Drive no esta configurado -> falta alguna variable de entorno.
+  401 Sesion no valida -> frontend no esta enviando correctamente cc_session/Bearer token.

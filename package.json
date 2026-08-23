@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "packageManager": "pnpm@8.15.7",
+  "workspaces": [
+    "calidad_next",
+    "calidad_nest"
+  ],
+  "scripts": {
+    "build": "pnpm --filter calidad_next run build",
+    "vercel-build": "pnpm --filter calidad_next run build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
