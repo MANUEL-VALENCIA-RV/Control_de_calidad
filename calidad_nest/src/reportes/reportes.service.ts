@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
+import { generarFolio } from './folio.generator';
 
 export type Reporte = {
   folio: string;
@@ -100,10 +101,12 @@ export class ReportesService {
   }
 
   async create(data: Omit<Reporte, 'id'>): Promise<Reporte> {
+    const folio = data.folio?.trim() || await generarFolio(this.prisma);
+
     try {
       const reporte = await this.prisma.reportes.create({
         data: {
-          folio: data.folio,
+          folio,
           cliente: data.cliente,
           direccion: data.direccion,
           telefono: data.telefono,
@@ -123,7 +126,7 @@ export class ReportesService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException(`El folio "${data.folio}" ya existe`);
+        throw new ConflictException(`El folio "${folio}" ya existe`);
       }
       throw error;
     }

@@ -1,14 +1,179 @@
-"use client";
-import { FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export function NuevoReporte({ open, onOpenChange, onCreated }: { open: boolean; onOpenChange: (open:boolean)=>void; onCreated:()=>void }) {
-  const [saving,setSaving]=useState(false); const [error,setError]=useState("");
-  const [form,setForm]=useState({folio:"",cliente:"",direccion:"",telefono:"",fechaReporte:"",reporte:""});
-  useEffect(()=>{if(!open){setError("");}},[open]);
-  if(!open)return null;
-  function set<K extends keyof typeof form>(key:K,value:string){setForm(v=>({...v,[key]:value}));}
-  async function submit(e:FormEvent){e.preventDefault();setSaving(true);setError("");try{const payload={...form,observaciones:"",evidencias:[],firma:"",responsable:"",fechaReparacion:"",terminado:false}; const res=await fetch("/api/reportes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data?.error||data?.message||"No se pudo crear el reporte");onOpenChange(false);setForm({folio:"",cliente:"",direccion:"",telefono:"",fechaReporte:"",reporte:""});onCreated();}catch(err){setError(err instanceof Error?err.message:"Error al crear");}finally{setSaving(false);}}
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onMouseDown={()=>onOpenChange(false)}><div className="w-full max-w-lg rounded-xl border bg-background p-5 shadow-2xl" onMouseDown={e=>e.stopPropagation()}><h2 className="mb-4 text-lg font-semibold">Nuevo reporte</h2><form onSubmit={submit} className="grid gap-3 sm:grid-cols-2"><Input placeholder="Folio" value={form.folio} onChange={e=>set("folio",e.target.value)} required/><Input placeholder="Cliente" value={form.cliente} onChange={e=>set("cliente",e.target.value)} required/><Input placeholder="Dirección" value={form.direccion} onChange={e=>set("direccion",e.target.value)} required/><Input placeholder="Teléfono" value={form.telefono} onChange={e=>set("telefono",e.target.value)} required/><Input type="date" value={form.fechaReporte} onChange={e=>set("fechaReporte",e.target.value)} required/><Input placeholder="Reporte" value={form.reporte} onChange={e=>set("reporte",e.target.value)} required className="sm:col-span-2"/>{error&&<p className="text-sm text-destructive sm:col-span-2">{error}</p>}<div className="flex justify-end gap-2 sm:col-span-2"><Button type="button" variant="outline" onClick={()=>onOpenChange(false)}>Cancelar</Button><Button type="submit" disabled={saving}>{saving?"Guardando...":"Guardar"}</Button></div></form></div></div>;
+type NuevoReporteProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCreated: () => void;
+};
+
+const initialForm = {
+  cliente: "",
+  direccion: "",
+  telefono: "",
+  fechaReporte: "",
+  reporte: "",
+};
+
+export function NuevoReporte({
+  open,
+  onOpenChange,
+  onCreated,
+}: NuevoReporteProps) {
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState(initialForm);
+
+  if (!open) {
+    return null;
+  }
+
+  function setField<K extends keyof typeof form>(key: K, value: string) {
+    setForm((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  }
+
+  function closeModal() {
+    setError("");
+    onOpenChange(false);
+  }
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setSaving(true);
+    setError("");
+
+    try {
+      const payload = {
+        ...form,
+        observaciones: "",
+        evidencias: [],
+        firma: "",
+        responsable: "",
+        fechaReparacion: "",
+        terminado: false,
+      };
+
+      const response = await fetch("/api/reportes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ?? data?.message ?? "No se pudo crear el reporte",
+        );
+      }
+
+      setForm(initialForm);
+      onCreated();
+      closeModal();
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Error al crear el reporte",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onMouseDown={closeModal}
+    >
+      <div
+        className="w-full max-w-lg rounded-xl border bg-background p-5 shadow-2xl"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <h2 className="mb-4 text-lg font-semibold">Nuevo reporte</h2>
+
+        <p className="mb-4 text-sm text-muted-foreground">
+          El folio se genera automáticamente (formato: MESddA-NN, ej. AGO246-02)
+        </p>
+
+        <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <Label htmlFor="cliente">Cliente</Label>
+            <Input
+              id="cliente"
+              placeholder="Cliente"
+              value={form.cliente}
+              onChange={(event) => setField("cliente", event.target.value)}
+              required
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <Label htmlFor="direccion">Dirección</Label>
+            <Input
+              id="direccion"
+              placeholder="Dirección"
+              value={form.direccion}
+              onChange={(event) => setField("direccion", event.target.value)}
+              required
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <Label htmlFor="telefono">Teléfono</Label>
+            <Input
+              id="telefono"
+              placeholder="Teléfono"
+              value={form.telefono}
+              onChange={(event) => setField("telefono", event.target.value)}
+              required
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <Label htmlFor="fechaReporte">Fecha de reporte</Label>
+            <Input
+              id="fechaReporte"
+              type="date"
+              value={form.fechaReporte}
+              onChange={(event) => setField("fechaReporte", event.target.value)}
+              required
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <Label htmlFor="reporte">Reporte</Label>
+            <Input
+              id="reporte"
+              placeholder="Reporte"
+              value={form.reporte}
+              onChange={(event) => setField("reporte", event.target.value)}
+              required
+            />
+          </div>
+
+          {error && (
+            <p className="text-sm text-destructive sm:col-span-2">{error}</p>
+          )}
+
+          <div className="flex justify-end gap-2 sm:col-span-2">
+            <Button type="button" variant="outline" onClick={closeModal}>
+              Cancelar
+            </Button>
+
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
