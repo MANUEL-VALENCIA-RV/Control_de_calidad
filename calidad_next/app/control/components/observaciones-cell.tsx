@@ -24,7 +24,7 @@ export function ObservacionesCell({ folio, observaciones, onUpdated }: { folio: 
   };
 
   const display = observaciones ? (
-    <span className="line-clamp-2">{observaciones}</span>
+    <span className="line-clamp-2" title={observaciones}>{observaciones}</span>
   ) : undefined;
 
   if (editing) return <CellEdit value={value} onChange={setValue} onSave={save} onCancel={cancel} saving={saving} error={error} textarea placeholder="Escribe las observaciones..." />;

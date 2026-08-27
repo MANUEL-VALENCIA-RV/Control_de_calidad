@@ -35,10 +35,18 @@ export function FirmaUpload({ folio, firma, onUpdated }: { folio: string; firma:
   return (
     <div className="group/firma flex items-center gap-1">
       {firma ? (
-        <span className="flex items-center gap-1 text-[11px] text-green-400">
-          <Check className="size-3" />
-          Firmado
-        </span>
+        <div className="relative group/firma-preview">
+          <span className="flex items-center gap-1 text-[11px] text-green-400">
+            <Check className="size-3" />
+            Firmado
+          </span>
+          <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 opacity-0 invisible scale-95 transition-all duration-200 group-hover/firma-preview:opacity-100 group-hover/firma-preview:visible group-hover/firma-preview:scale-100">
+            <div className="rounded-lg border border-white/10 bg-black/90 p-1.5 shadow-xl backdrop-blur-sm">
+              <img src={`/api/firma/${encodeURIComponent(firma)}`} alt="Vista previa de firma" className="block max-h-[150px] max-w-[200px] rounded object-contain" />
+            </div>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/90" />
+          </div>
+        </div>
       ) : (
         <span className="text-[11px] text-muted-foreground">Sin firma</span>
       )}

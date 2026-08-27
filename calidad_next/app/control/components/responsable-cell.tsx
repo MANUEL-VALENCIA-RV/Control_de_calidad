@@ -24,5 +24,6 @@ export function ResponsableCell({ folio, responsable, onUpdated }: { folio: stri
   };
 
   if (editing) return <CellEdit value={value} onChange={setValue} onSave={save} onCancel={cancel} saving={saving} error={error} placeholder="Nombre del responsable..." />;
-  return <CellRead value={responsable} placeholder="Sin responsable" onEdit={start} />;
+  const display = responsable ? <span title={responsable}>{responsable}</span> : undefined;
+  return <CellRead value={responsable} display={display} placeholder="Sin responsable" onEdit={start} />;
 }
