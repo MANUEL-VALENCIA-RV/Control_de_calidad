@@ -288,28 +288,41 @@ export default function Reportes() {
               </div>
             ) : (
               <>
-                <div className="w-full overflow-x-auto">
-                    <Table className="w-full min-w-[1200px] table-fixed">
+                <div className="w-full overflow-x-auto overscroll-x-contain">
+                  <Table className="min-w-[1840px] table-fixed">
+                    <colgroup>
+                      <col className="w-[120px]" />
+                      <col className="w-[200px]" />
+                      <col className="w-[230px]" />
+                      <col className="w-[125px]" />
+                      <col className="w-[140px]" />
+                      <col className="w-[300px]" />
+                      <col className="w-[250px]" />
+                      <col className="w-[130px]" />
+                      <col className="w-[165px]" />
+                      <col className="w-[155px]" />
+                      <col className="w-[125px]" />
+                    </colgroup>
                     <TableHeader className="bg-white/[0.04]">
                       <TableRow>
-                        <TableHead className="w-[9%] text-center">Folio</TableHead>
-                        <TableHead className="w-[12%] text-center">Cliente</TableHead>
-                        <TableHead className="w-[14%]">Dirección</TableHead>
-                        <TableHead className="w-[7%] text-center">Teléfono</TableHead>
-                        <TableHead className="w-[7%] text-center">Fecha de reporte</TableHead>
-                        <TableHead className="w-[15%]">Reporte</TableHead>
-                        <TableHead className="w-[13%]">Observaciones</TableHead>
-                        <TableHead className="w-[5%] text-center">Evidencias</TableHead>
-                        <TableHead className="w-[7%] text-center">Responsable</TableHead>
-                        <TableHead className="w-[6%] text-center">Fecha de reparación</TableHead>
-                        <TableHead className="w-[5%] text-center">Estado</TableHead>
+                        <TableHead className="text-center">Folio</TableHead>
+                        <TableHead className="text-center">Cliente</TableHead>
+                        <TableHead>Dirección</TableHead>
+                        <TableHead className="text-center">Teléfono</TableHead>
+                        <TableHead className="text-center">Fecha de reporte</TableHead>
+                        <TableHead>Reporte</TableHead>
+                        <TableHead>Observaciones</TableHead>
+                        <TableHead className="text-center">Evidencias</TableHead>
+                        <TableHead className="text-center">Responsable</TableHead>
+                        <TableHead className="text-center">Fecha de reparación</TableHead>
+                        <TableHead className="text-center">Estado</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {reports.map((row) => (
                         <TableRow key={row.folio} className="align-middle">
-                          <TableCell className="align-middle px-2 text-center whitespace-nowrap">
-                            <div className="flex justify-center">
+                          <TableCell className="align-middle px-3 py-3 text-center whitespace-nowrap">
+                            <div className="flex min-w-0 justify-center">
                               <FolioCell folio={row.folio} onUpdated={handleUpdated} />
                             </div>
                           </TableCell>
@@ -387,8 +400,8 @@ export default function Reportes() {
                             </div>
                           </TableCell>
 
-                          <TableCell className="align-middle px-2 text-center whitespace-nowrap">
-                            <div className="flex items-center justify-center">
+                          <TableCell className="align-middle px-3 py-3 text-center">
+                            <div className="flex min-w-0 items-center justify-center">
                               <EvidenceUpload
                                 folio={row.folio}
                                 evidencias={row.evidencias}

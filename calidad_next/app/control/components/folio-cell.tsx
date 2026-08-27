@@ -35,7 +35,7 @@ export function FolioCell({ folio, onUpdated }: { folio: string; onUpdated: (old
     <button
       type="button"
       onClick={start}
-      className="max-w-full whitespace-nowrap rounded px-1 py-0.5 text-xs font-semibold text-foreground tabular-nums transition hover:bg-white/5"
+      className="min-w-[88px] whitespace-nowrap rounded px-2 py-1 text-center text-xs font-semibold text-foreground tabular-nums transition hover:bg-white/5"
       title={folio || "Sin folio"}
     >
       {folio || "Sin folio"}

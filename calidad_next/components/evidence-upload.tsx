@@ -1,58 +1,131 @@
 "use client";
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, LoaderCircle, Plus, Trash2, X } from "lucide-react";
+
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+  LoaderCircle,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { createPortal } from "react-dom";
+
 import { deleteEvidencia } from "@/lib/reports";
 import type { ReportRow } from "@/lib/reports";
 
-function evidencesAt(list: string[], i: number): string | undefined {
-  return list[i]?.trim() || undefined;
+function evidenceAt(list: string[], index: number): string | undefined {
+  return list[index]?.trim() || undefined;
 }
 
-function EvidencePreview({ visible, index, onIndexChange }: { visible: string[]; index: number; onIndexChange: (i: number) => void }) {
-  const safeIndex = Math.min(index, Math.max(0, visible.length - 1));
-  const prev = () => onIndexChange(safeIndex > 0 ? safeIndex - 1 : visible.length - 1);
-  const next = () => onIndexChange(safeIndex < visible.length - 1 ? safeIndex + 1 : 0);
+function EvidenceImage({
+  fileId,
+  alt,
+  className,
+}: {
+  fileId: string;
+  alt: string;
+  className: string;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => setFailed(false), [fileId]);
+
+  if (failed) {
+    return (
+      <div
+        className={`${className} flex items-center justify-center bg-white/[0.05] text-muted-foreground`}
+        title="No se pudo cargar la evidencia"
+      >
+        <ImageIcon className="size-5" />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col rounded-xl border border-white/10 bg-[#0c1322]/95 p-2 shadow-[0_16px_60px_rgba(0,0,0,0.6)] backdrop-blur-md">
-      <div className="relative flex items-center justify-center">
-        <img
-          src={`/api/evidencias/${encodeURIComponent(evidencesAt(visible, safeIndex) ?? "")}`}
+    <img
+      src={`/api/evidencias/${encodeURIComponent(fileId)}`}
+      alt={alt}
+      className={className}
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+function EvidencePreview({
+  visible,
+  index,
+  onIndexChange,
+}: {
+  visible: string[];
+  index: number;
+  onIndexChange: (index: number) => void;
+}) {
+  const safeIndex = Math.min(index, Math.max(0, visible.length - 1));
+  const fileId = evidenceAt(visible, safeIndex);
+  const prev = () =>
+    onIndexChange(safeIndex > 0 ? safeIndex - 1 : visible.length - 1);
+  const next = () =>
+    onIndexChange(safeIndex < visible.length - 1 ? safeIndex + 1 : 0);
+
+  if (!fileId) return null;
+
+  return (
+    <div className="flex w-[420px] flex-col rounded-xl border border-white/10 bg-[#0c1322]/95 p-2 shadow-[0_16px_60px_rgba(0,0,0,0.6)] backdrop-blur-md">
+      <div className="relative flex min-h-[220px] items-center justify-center overflow-hidden rounded-lg bg-black/20">
+        <EvidenceImage
+          fileId={fileId}
           alt={`Evidencia ${safeIndex + 1}`}
           className="max-h-[350px] max-w-[400px] rounded-lg object-contain"
         />
+
         {visible.length > 1 && (
           <>
-            <button type="button" onClick={prev} className="absolute left-1 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white/80 backdrop-blur-sm transition hover:bg-black/70 hover:text-white">
+            <button
+              type="button"
+              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80"
+              aria-label="Evidencia anterior"
+            >
               <ChevronLeft className="size-4" />
             </button>
-            <button type="button" onClick={next} className="absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white/80 backdrop-blur-sm transition hover:bg-black/70 hover:text-white">
+            <button
+              type="button"
+              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80"
+              aria-label="Evidencia siguiente"
+            >
               <ChevronRight className="size-4" />
             </button>
           </>
         )}
       </div>
+
       {visible.length > 1 && (
-        <div className="mt-2 flex items-center justify-center gap-1.5">
-          <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-medium text-white/70 tabular-nums">
-            {safeIndex + 1} / {visible.length}
-          </span>
-        </div>
-      )}
-      {visible.length > 1 && (
-        <div className="mt-2 flex items-center justify-center gap-1">
-          {visible.map((fileId, i) => (
+        <div className="mt-2 flex items-center gap-1 overflow-x-auto">
+          {visible.map((id, i) => (
             <button
-              key={fileId}
+              key={`${id}-${i}`}
               type="button"
               onClick={() => onIndexChange(i)}
-              className={`shrink-0 overflow-hidden rounded border transition ${i === safeIndex ? "border-white/40 ring-1 ring-white/20" : "border-white/10 opacity-50 hover:opacity-80"}`}
+              className={`shrink-0 overflow-hidden rounded border transition ${
+                i === safeIndex
+                  ? "border-white/40 ring-1 ring-white/20"
+                  : "border-white/10 opacity-60 hover:opacity-100"
+              }`}
             >
-              <img
-                src={`/api/evidencias/${encodeURIComponent(fileId)}`}
-                alt={`Mini ${i + 1}`}
-                className="block size-8 object-cover"
+              <EvidenceImage
+                fileId={id}
+                alt={`Miniatura ${i + 1}`}
+                className="block size-9 object-cover"
               />
             </button>
           ))}
@@ -62,85 +135,158 @@ function EvidencePreview({ visible, index, onIndexChange }: { visible: string[];
   );
 }
 
-function EvidenceImageViewer({ evidencias, folio, index, onClose, onDeleted }: { evidencias: string[]; folio: string; index: number; onClose: () => void; onDeleted: (row: ReportRow) => void }) {
+function EvidenceImageViewer({
+  evidencias,
+  folio,
+  index,
+  onClose,
+  onDeleted,
+}: {
+  evidencias: string[];
+  folio: string;
+  index: number;
+  onClose: () => void;
+  onDeleted: (row: ReportRow) => void;
+}) {
   const [current, setCurrent] = useState(index);
   const [deleting, setDeleting] = useState(false);
   const safeIndex = Math.min(current, Math.max(0, evidencias.length - 1));
-  const prev = () => setCurrent((i) => (i > 0 ? i - 1 : evidencias.length - 1));
-  const next = () => setCurrent((i) => (i < evidencias.length - 1 ? i + 1 : 0));
+  const fileId = evidenceAt(evidencias, safeIndex);
+
+  const prev = () =>
+    setCurrent((i) => (i > 0 ? i - 1 : evidencias.length - 1));
+  const next = () =>
+    setCurrent((i) => (i < evidencias.length - 1 ? i + 1 : 0));
 
   async function remove() {
-    if (!confirm("Eliminar esta evidencia?")) return;
+    if (!fileId || !confirm("¿Eliminar esta evidencia?")) return;
+
     setDeleting(true);
     try {
-      const fileId = evidencesAt(evidencias, safeIndex);
-      if (!fileId) return;
-      const row = await deleteEvidencia(folio, fileId) as ReportRow;
+      const row = (await deleteEvidencia(folio, fileId)) as ReportRow;
       onDeleted(row);
       const remaining = row.evidencias?.length ?? 0;
       if (remaining <= 0) onClose();
       else if (safeIndex >= remaining) setCurrent(remaining - 1);
-    } catch { } finally { setDeleting(false); }
+    } finally {
+      setDeleting(false);
+    }
   }
 
+  if (!fileId) return null;
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4" onMouseDown={onClose}>
-      <button type="button" onClick={onClose} className="absolute top-4 right-4 z-10 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"><X className="size-5" /></button>
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4"
+      onMouseDown={onClose}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+        aria-label="Cerrar"
+      >
+        <X className="size-5" />
+      </button>
+
       {evidencias.length > 1 && (
-        <button type="button" onClick={(e) => { e.stopPropagation(); prev(); }} className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 md:left-4"><ChevronLeft className="size-6" /></button>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            prev();
+          }}
+          className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 md:left-4"
+          aria-label="Evidencia anterior"
+        >
+          <ChevronLeft className="size-6" />
+        </button>
       )}
-      <div className="flex max-h-[85vh] max-w-[90vw] items-center justify-center" onMouseDown={(e) => e.stopPropagation()}>
-        <img src={`/api/evidencias/${encodeURIComponent(evidencesAt(evidencias, safeIndex) ?? "")}`} alt={`Evidencia ${safeIndex + 1}`} className="max-h-[85vh] max-w-[85vw] rounded-lg object-contain" />
+
+      <div
+        className="flex max-h-[85vh] max-w-[90vw] items-center justify-center"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <EvidenceImage
+          fileId={fileId}
+          alt={`Evidencia ${safeIndex + 1}`}
+          className="max-h-[85vh] max-w-[85vw] rounded-lg object-contain"
+        />
       </div>
+
       {evidencias.length > 1 && (
-        <button type="button" onClick={(e) => { e.stopPropagation(); next(); }} className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 md:right-4"><ChevronRight className="size-6" /></button>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            next();
+          }}
+          className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 md:right-4"
+          aria-label="Evidencia siguiente"
+        >
+          <ChevronRight className="size-6" />
+        </button>
       )}
+
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-3">
         {evidencias.length > 1 && (
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white tabular-nums">{safeIndex + 1} / {evidencias.length}</span>
+          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white tabular-nums">
+            {safeIndex + 1} / {evidencias.length}
+          </span>
         )}
-        <button type="button" onClick={(e) => { e.stopPropagation(); remove(); }} disabled={deleting} className="rounded-full bg-destructive/20 p-2 text-destructive transition-colors hover:bg-destructive/30">
-          {deleting ? <LoaderCircle className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            void remove();
+          }}
+          disabled={deleting}
+          className="rounded-full bg-destructive/20 p-2 text-destructive transition-colors hover:bg-destructive/30 disabled:opacity-50"
+          aria-label="Eliminar evidencia"
+        >
+          {deleting ? (
+            <LoaderCircle className="size-4 animate-spin" />
+          ) : (
+            <Trash2 className="size-4" />
+          )}
         </button>
       </div>
     </div>
   );
 }
 
-function useFloatingPosition(triggerRef: React.RefObject<HTMLDivElement | null>, open: boolean) {
-  const [pos, setPos] = useState<{ x: number; y: number; place: "top" | "bottom" }>({ x: 0, y: 0, place: "top" });
+function useFloatingPosition(
+  triggerRef: React.RefObject<HTMLDivElement | null>,
+  open: boolean,
+) {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
 
   const calculate = useCallback(() => {
     const el = triggerRef.current;
     if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
 
+    const rect = el.getBoundingClientRect();
     const previewW = 420;
-    const previewH = 400;
+    const previewH = 390;
     const gap = 12;
 
     let x = rect.left + rect.width / 2 - previewW / 2;
-    if (x < gap) x = gap;
-    if (x + previewW > vw - gap) x = vw - gap - previewW;
+    x = Math.max(gap, Math.min(x, window.innerWidth - previewW - gap));
 
-    let place: "top" | "bottom" = "top";
     let y = rect.top - previewH - gap;
-    if (y < gap || rect.top - previewH - gap < 0) {
-      place = "bottom";
-      y = rect.bottom + gap;
-      if (y + previewH > vh - gap) y = vh - gap - previewH;
-    }
+    if (y < gap) y = rect.bottom + gap;
+    y = Math.max(gap, Math.min(y, window.innerHeight - previewH - gap));
 
-    setPos({ x, y, place });
+    setPos({ x, y });
   }, [triggerRef]);
 
   useEffect(() => {
     if (!open) return;
+
     calculate();
     window.addEventListener("scroll", calculate, true);
     window.addEventListener("resize", calculate);
+
     return () => {
       window.removeEventListener("scroll", calculate, true);
       window.removeEventListener("resize", calculate);
@@ -150,9 +296,20 @@ function useFloatingPosition(triggerRef: React.RefObject<HTMLDivElement | null>,
   return pos;
 }
 
-export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string; evidencias: string[]; onUpdated: (oldFolio: string, row: ReportRow) => void }) {
+export function EvidenceUpload({
+  folio,
+  evidencias,
+  onUpdated,
+}: {
+  folio: string;
+  evidencias: string[];
+  onUpdated: (oldFolio: string, row: ReportRow) => void;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -160,48 +317,71 @@ export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string
   const [hovered, setHovered] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
-  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const visible = (Array.isArray(evidencias) ? evidencias : []).filter(
+    (id) => typeof id === "string" && id.trim().length > 0,
+  );
+  const count = visible.length;
   const pos = useFloatingPosition(triggerRef, hovered);
 
-  async function change(e: ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
+  async function change(event: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? []);
     if (!files.length) return;
-    setLoading(true); setError("");
+
+    setLoading(true);
+    setError("");
+
     try {
       let row: ReportRow | undefined;
+
       for (const file of files) {
-        const fd = new FormData(); fd.append("file", file);
-        const res = await fetch(`/api/reportes/${encodeURIComponent(folio)}/evidencias`, { method: "POST", body: fd });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data?.error || data?.message || "No se pudo subir evidencia");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch(
+          `/api/reportes/${encodeURIComponent(folio)}/evidencias`,
+          { method: "POST", body: formData },
+        );
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            data?.error || data?.message || "No se pudo subir evidencia",
+          );
+        }
         row = data as ReportRow;
       }
+
       if (row) onUpdated(folio, row);
-    } catch (err) { setError(err instanceof Error ? err.message : "Error al subir"); } finally { setLoading(false); if (inputRef.current) inputRef.current.value = ""; }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al subir");
+    } finally {
+      setLoading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
   }
 
-  const visible = (Array.isArray(evidencias) ? evidencias : []).filter((id) => id && id.trim());
-  const count = visible.length;
+  function onEnter() {
+    if (!count) return;
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    hoverTimer.current = setTimeout(() => {
+      setPreviewIndex(0);
+      setHovered(true);
+    }, 220);
+  }
 
-  const onEnter = () => {
-    if (leaveTimer.current) { clearTimeout(leaveTimer.current); leaveTimer.current = null; }
-    hoverTimer.current = setTimeout(() => { setPreviewIndex(0); setHovered(true); }, 250);
-  };
+  function onLeave() {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    leaveTimer.current = setTimeout(() => setHovered(false), 140);
+  }
 
-  const onLeave = () => {
-    if (hoverTimer.current) { clearTimeout(hoverTimer.current); hoverTimer.current = null; }
-    leaveTimer.current = setTimeout(() => setHovered(false), 150);
-  };
+  function onPreviewEnter() {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+  }
 
-  const onPreviewEnter = () => {
-    if (leaveTimer.current) { clearTimeout(leaveTimer.current); leaveTimer.current = null; }
-  };
-
-  const onPreviewLeave = () => {
+  function onPreviewLeave() {
     leaveTimer.current = setTimeout(() => setHovered(false), 100);
-  };
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -212,53 +392,103 @@ export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string
   }, []);
 
   return (
-    <div className="group/evid relative flex items-center gap-1">
+    <div className="group/evid flex min-w-[92px] items-center justify-center gap-2">
       {count > 0 ? (
         <>
-          <div ref={triggerRef} className="relative" onMouseEnter={onEnter} onMouseLeave={onLeave}>
-            <button type="button" onClick={() => { setViewerIndex(0); setViewerOpen(true); }} className="relative shrink-0 cursor-pointer overflow-hidden rounded-md border border-white/10 transition hover:border-white/30">
-              <img
-                src={`/api/evidencias/${encodeURIComponent(visible[0])}`}
+          <div
+            ref={triggerRef}
+            className="relative shrink-0"
+            onMouseEnter={onEnter}
+            onMouseLeave={onLeave}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setViewerIndex(0);
+                setViewerOpen(true);
+              }}
+              className="relative flex size-14 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-white/15 bg-white/[0.04] transition hover:border-white/35 hover:bg-white/[0.07]"
+              aria-label={`Ver ${count} evidencia${count === 1 ? "" : "s"}`}
+            >
+              <EvidenceImage
+                fileId={visible[0]}
                 alt="Evidencia"
-                className="block size-11 rounded-md object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.style.opacity = "0.25";
-                  e.currentTarget.title = "No se pudo cargar la evidencia";
-                }}
+                className="block size-full object-cover"
               />
               {count > 1 && (
-                <span className="absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground shadow">+{count - 1}</span>
+                <span className="absolute bottom-1 right-1 rounded-full bg-black/75 px-1.5 py-0.5 text-[9px] font-bold leading-none text-white shadow">
+                  +{count - 1}
+                </span>
               )}
             </button>
           </div>
-          {mounted && hovered && createPortal(
-            <div
-              className="fixed z-[200] opacity-100 transition-opacity duration-150"
-              style={{ left: pos.x, top: pos.y }}
-              onMouseEnter={onPreviewEnter}
-              onMouseLeave={onPreviewLeave}
-            >
-              <EvidencePreview visible={visible} index={previewIndex} onIndexChange={setPreviewIndex} />
-            </div>,
-            document.body,
-          )}
+
+          {mounted &&
+            hovered &&
+            createPortal(
+              <div
+                className="fixed z-[250]"
+                style={{ left: pos.x, top: pos.y }}
+                onMouseEnter={onPreviewEnter}
+                onMouseLeave={onPreviewLeave}
+              >
+                <EvidencePreview
+                  visible={visible}
+                  index={previewIndex}
+                  onIndexChange={setPreviewIndex}
+                />
+              </div>,
+              document.body,
+            )}
         </>
       ) : (
-        <span className="text-[11px] text-muted-foreground">Sin ev.</span>
+        <span className="whitespace-nowrap text-[11px] text-muted-foreground">
+          Sin evidencias
+        </span>
       )}
-      <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={change} />
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={change}
+      />
+
       <button
         type="button"
         disabled={loading}
         onClick={() => inputRef.current?.click()}
-        className="shrink-0 rounded p-0.5 text-muted-foreground/0 transition-colors hover:bg-white/10 hover:text-foreground group-hover/evid:text-muted-foreground"
+        className="shrink-0 rounded-md border border-white/10 bg-white/[0.03] p-1.5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground disabled:opacity-50"
         aria-label="Agregar evidencia"
+        title="Agregar evidencia"
       >
-        {loading ? <LoaderCircle className="size-3 animate-spin" /> : <Plus className="size-3" />}
+        {loading ? (
+          <LoaderCircle className="size-3.5 animate-spin" />
+        ) : (
+          <Plus className="size-3.5" />
+        )}
       </button>
-      {error && <span className="max-w-32 text-[10px] text-destructive">{error}</span>}
-      {viewerOpen && <EvidenceImageViewer evidencias={visible} folio={folio} index={viewerIndex} onClose={() => setViewerOpen(false)} onDeleted={(row) => onUpdated(folio, row)} />}
+
+      {error && (
+        <span className="absolute mt-20 max-w-48 rounded bg-background px-2 py-1 text-[10px] text-destructive shadow-lg">
+          {error}
+        </span>
+      )}
+
+      {viewerOpen &&
+        mounted &&
+        createPortal(
+          <EvidenceImageViewer
+            evidencias={visible}
+            folio={folio}
+            index={viewerIndex}
+            onClose={() => setViewerOpen(false)}
+            onDeleted={(row) => onUpdated(folio, row)}
+          />,
+          document.body,
+        )}
     </div>
   );
 }
