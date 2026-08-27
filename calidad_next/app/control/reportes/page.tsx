@@ -289,20 +289,20 @@ export default function Reportes() {
             ) : (
               <>
                 <div className="w-full overflow-x-auto">
-                  <Table className="w-full min-w-[1100px] table-fixed">
+                    <Table className="w-full min-w-[1200px] table-fixed">
                     <TableHeader className="bg-white/[0.04]">
                       <TableRow>
-                        <TableHead className="w-[5%] text-center">Folio</TableHead>
+                        <TableHead className="w-[4%] text-center">Folio</TableHead>
                         <TableHead className="w-[14%] text-center">Cliente</TableHead>
-                        <TableHead className="w-[13%]">Dirección</TableHead>
-                        <TableHead className="w-[9%] text-center">Teléfono</TableHead>
-                        <TableHead className="w-[8%] text-center">Fecha de reporte</TableHead>
-                        <TableHead className="w-[14%]">Reporte</TableHead>
-                        <TableHead className="w-[12%]">Observaciones</TableHead>
-                        <TableHead className="w-[7%] text-center">Evidencias</TableHead>
-                        <TableHead className="w-[9%] text-center">Responsable</TableHead>
-                        <TableHead className="w-[8%] text-center">Fecha de reparación</TableHead>
-                        <TableHead className="w-[9%] text-center">Estado</TableHead>
+                        <TableHead className="w-[16%]">Dirección</TableHead>
+                        <TableHead className="w-[7%] text-center">Teléfono</TableHead>
+                        <TableHead className="w-[7%] text-center">Fecha de reporte</TableHead>
+                        <TableHead className="w-[16%]">Reporte</TableHead>
+                        <TableHead className="w-[13%]">Observaciones</TableHead>
+                        <TableHead className="w-[5%] text-center">Evidencias</TableHead>
+                        <TableHead className="w-[7%] text-center">Responsable</TableHead>
+                        <TableHead className="w-[6%] text-center">Fecha de reparación</TableHead>
+                        <TableHead className="w-[5%] text-center">Estado</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -429,15 +429,15 @@ export default function Reportes() {
                           </TableCell>
 
                           <TableCell className="align-middle px-2 py-3 text-center">
-                            <div className="flex w-full min-w-0 flex-col items-center justify-center gap-1.5">
+                            <div className="flex min-w-0 flex-col items-center gap-1">
                               {row.terminado ? (
-                                <Badge className="gap-1.5 bg-green-500/15 text-green-400">
-                                  <span className="size-1.5 rounded-full bg-green-400" />
+                                <Badge className="w-full max-w-[80px] justify-center gap-1 bg-green-500/15 text-[10px] text-green-400">
+                                  <span className="size-1.5 shrink-0 rounded-full bg-green-400" />
                                   Terminado
                                 </Badge>
                               ) : (
-                                <Badge className="gap-1.5 bg-orange-500/15 text-orange-400">
-                                  <span className="size-1.5 rounded-full bg-orange-400" />
+                                <Badge className="w-full max-w-[80px] justify-center gap-1 bg-orange-500/15 text-[10px] text-orange-400">
+                                  <span className="size-1.5 shrink-0 rounded-full bg-orange-400" />
                                   Pendiente
                                 </Badge>
                               )}
