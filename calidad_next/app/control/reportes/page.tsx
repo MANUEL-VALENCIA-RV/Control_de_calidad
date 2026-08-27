@@ -46,19 +46,19 @@ const statusOptions: {
   value: StatusFilter;
   label: string;
 }[] = [
-  {
-    value: "todos",
-    label: "Todos",
-  },
-  {
-    value: "terminados",
-    label: "Terminados",
-  },
-  {
-    value: "pendientes",
-    label: "Pendientes",
-  },
-];
+    {
+      value: "todos",
+      label: "Todos",
+    },
+    {
+      value: "terminados",
+      label: "Terminados",
+    },
+    {
+      value: "pendientes",
+      label: "Pendientes",
+    },
+  ];
 
 const PAGE_SIZE = 8;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -230,11 +230,10 @@ export default function Reportes() {
 
                       setPage(1);
                     }}
-                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-100 ${
-                      status === option.value
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-100 ${status === option.value
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                      }`}
                   >
                     {option.label}
                   </button>
@@ -293,54 +292,19 @@ export default function Reportes() {
                   <Table className="w-full min-w-[1100px] table-fixed">
                     <TableHeader className="bg-white/[0.04]">
                       <TableRow>
-                        <TableHead className="w-[5%] text-center">
-                          Anomalias
-                        </TableHead>
-                        <TableHead className="w-[5%] text-center">
-                          Folio
-                        </TableHead>
-
-                        <TableHead className="w-[14%] text-center">
-                          Cliente
-                        </TableHead>
-
+                        <TableHead className="w-[5%] text-center">Folio</TableHead>
+                        <TableHead className="w-[14%] text-center">Cliente</TableHead>
                         <TableHead className="w-[13%]">Dirección</TableHead>
-
-                        <TableHead className="w-[9%] text-center">
-                          Teléfono
-                        </TableHead>
-
-                        <TableHead className="w-[8%] text-center">
-                          <span className="block">F.</span>
-                          <span className="block">Reporte</span>
-                        </TableHead>
-
+                        <TableHead className="w-[9%] text-center">Teléfono</TableHead>
+                        <TableHead className="w-[8%] text-center">Fecha de reporte</TableHead>
                         <TableHead className="w-[14%]">Reporte</TableHead>
-
                         <TableHead className="w-[12%]">Observaciones</TableHead>
-
-                        <TableHead className="w-[7%] text-center">
-                          Evidencias
-                        </TableHead>
-
-                        <TableHead className="w-[9%] text-center">
-                          Responsable
-                        </TableHead>
-
-                        <TableHead className="w-[8%] text-center">
-                          <span className="block">F.</span>
-                          <span className="block">Reparación</span>
-                        </TableHead>
-
-                        <TableHead className="w-[9%] text-center">
-                          Estado
-                        </TableHead>
-                        <TableHead className="w-[5%] text-center">
-                          Acuerdo / Desacuerdo
-                        </TableHead>
+                        <TableHead className="w-[7%] text-center">Evidencias</TableHead>
+                        <TableHead className="w-[9%] text-center">Responsable</TableHead>
+                        <TableHead className="w-[8%] text-center">Fecha de reparación</TableHead>
+                        <TableHead className="w-[9%] text-center">Estado</TableHead>
                       </TableRow>
                     </TableHeader>
-
                     <TableBody>
                       {reports.map((row) => (
                         <TableRow key={row.folio} className="align-middle">
@@ -349,7 +313,6 @@ export default function Reportes() {
                               <FolioCell folio={row.folio} onUpdated={load} />
                             </div>
                           </TableCell>
-
                           <TableCell className="align-middle px-3 py-3 text-center">
                             <div
                               className="
@@ -368,7 +331,6 @@ export default function Reportes() {
                               {row.cliente}
                             </div>
                           </TableCell>
-
                           <TableCell className="min-w-0 align-middle px-3 py-3 text-left">
                             <div
                               className="

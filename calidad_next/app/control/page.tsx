@@ -95,8 +95,8 @@ export default function Dashboard() {
             if (!response.ok) {
                 throw new Error(
                     data?.error ||
-                        data?.message ||
-                        "No se pudieron cargar los reportes",
+                    data?.message ||
+                    "No se pudieron cargar los reportes",
                 );
             }
 
@@ -145,15 +145,15 @@ export default function Dashboard() {
     const pctTerminado =
         total > 0
             ? Math.round(
-                  (terminados / total) * 100,
-              )
+                (terminados / total) * 100,
+            )
             : 0;
 
     const pctPendiente =
         total > 0
             ? Math.round(
-                  (pendientes / total) * 100,
-              )
+                (pendientes / total) * 100,
+            )
             : 0;
 
     const realPendientes = useMemo(
@@ -212,13 +212,13 @@ export default function Dashboard() {
     const termSeg =
         total > 0
             ? (terminados / total) *
-              circumference
+            circumference
             : 0;
 
     const pendSeg =
         total > 0
             ? (pendientes / total) *
-              circumference
+            circumference
             : 0;
 
     return (
@@ -335,10 +335,9 @@ export default function Dashboard() {
                                                 style={{
                                                     stroke:
                                                         "var(--chart-3)",
-                                                    strokeDasharray: `${pendSeg} ${
-                                                        circumference -
+                                                    strokeDasharray: `${pendSeg} ${circumference -
                                                         pendSeg
-                                                    }`,
+                                                        }`,
                                                     strokeDashoffset:
                                                         -termSeg,
                                                 }}
@@ -358,10 +357,9 @@ export default function Dashboard() {
                                                 style={{
                                                     stroke:
                                                         "var(--chart-2)",
-                                                    strokeDasharray: `${termSeg} ${
-                                                        circumference -
+                                                    strokeDasharray: `${termSeg} ${circumference -
                                                         termSeg
-                                                    }`,
+                                                        }`,
                                                 }}
                                             />
                                         )}
@@ -451,7 +449,7 @@ export default function Dashboard() {
                                     </p>
                                 </div>
                             ) : previewPendientes.length ===
-                              0 ? (
+                                0 ? (
                                 <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 py-16 text-center">
                                     <CheckCircle2 className="size-8 text-green-400" />
 
