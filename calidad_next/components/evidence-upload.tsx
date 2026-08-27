@@ -59,6 +59,7 @@ export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string
   const [error, setError] = useState("");
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const [hovered, setHovered] = useState(false);
 
   async function change(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -84,22 +85,24 @@ export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string
     <div className="group/evid relative flex items-center gap-1">
       {count > 0 ? (
         <>
-          <div className="relative">
-            <button type="button" onClick={() => { setViewerIndex(0); setViewerOpen(true); }} className="group/thumb relative shrink-0 cursor-pointer overflow-hidden rounded border border-white/10 transition hover:border-white/30">
+          <div className="relative" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+            <button type="button" onClick={() => { setViewerIndex(0); setViewerOpen(true); }} className="relative shrink-0 cursor-pointer overflow-hidden rounded border border-white/10 transition hover:border-white/30">
               <img src={`/api/evidencias/${encodeURIComponent(visible[0])}`} alt="Evidencia" className="block size-9 rounded object-cover" loading="lazy" />
               {count > 1 && (
                 <span className="absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground shadow">+{count - 1}</span>
               )}
             </button>
-            <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 opacity-0 invisible scale-95 transition-all duration-200 group-hover/thumb:opacity-100 group-hover/thumb:visible group-hover/thumb:scale-100">
-              <div className="rounded-lg border border-white/10 bg-black/90 p-1.5 shadow-xl backdrop-blur-sm">
-                <img src={`/api/evidencias/${encodeURIComponent(visible[0])}`} alt="Vista previa" className="block max-h-[200px] max-w-[250px] rounded object-contain" />
-                {count > 1 && (
-                  <div className="mt-1 border-t border-white/10 pt-1 text-center text-[10px] text-muted-foreground">{count} evidencia{count > 1 ? "s" : ""}</div>
-                )}
+            {hovered && (
+              <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2">
+                <div className="rounded-lg border border-white/10 bg-black/90 p-1.5 shadow-xl backdrop-blur-sm">
+                  <img src={`/api/evidencias/${encodeURIComponent(visible[0])}`} alt="Vista previa" className="block max-h-[200px] max-w-[250px] rounded object-contain" />
+                  {count > 1 && (
+                    <div className="mt-1 border-t border-white/10 pt-1 text-center text-[10px] text-muted-foreground">{count} evidencia{count > 1 ? "s" : ""}</div>
+                  )}
+                </div>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/90" />
               </div>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/90" />
-            </div>
+            )}
           </div>
           <span className="hidden text-[11px] text-muted-foreground lg:inline">{count} ev.</span>
         </>
