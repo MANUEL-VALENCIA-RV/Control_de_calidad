@@ -159,6 +159,7 @@ export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string
   const [viewerIndex, setViewerIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -203,6 +204,7 @@ export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string
   };
 
   useEffect(() => {
+    setMounted(true);
     return () => {
       if (hoverTimer.current) clearTimeout(hoverTimer.current);
       if (leaveTimer.current) clearTimeout(leaveTimer.current);
@@ -215,15 +217,24 @@ export function EvidenceUpload({ folio, evidencias, onUpdated }: { folio: string
         <>
           <div ref={triggerRef} className="relative" onMouseEnter={onEnter} onMouseLeave={onLeave}>
             <button type="button" onClick={() => { setViewerIndex(0); setViewerOpen(true); }} className="relative shrink-0 cursor-pointer overflow-hidden rounded-md border border-white/10 transition hover:border-white/30">
-              <img src={`/api/evidencias/${encodeURIComponent(visible[0])}`} alt="Evidencia" className="block size-11 rounded-md object-cover" loading="lazy" />
+              <img
+                src={`/api/evidencias/${encodeURIComponent(visible[0])}`}
+                alt="Evidencia"
+                className="block size-11 rounded-md object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.opacity = "0.25";
+                  e.currentTarget.title = "No se pudo cargar la evidencia";
+                }}
+              />
               {count > 1 && (
                 <span className="absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground shadow">+{count - 1}</span>
               )}
             </button>
           </div>
-          {createPortal(
+          {mounted && hovered && createPortal(
             <div
-              className={`fixed z-[200] transition-opacity duration-150 ${hovered ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+              className="fixed z-[200] opacity-100 transition-opacity duration-150"
               style={{ left: pos.x, top: pos.y }}
               onMouseEnter={onPreviewEnter}
               onMouseLeave={onPreviewLeave}

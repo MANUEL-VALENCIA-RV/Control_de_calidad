@@ -292,12 +292,12 @@ export default function Reportes() {
                     <Table className="w-full min-w-[1200px] table-fixed">
                     <TableHeader className="bg-white/[0.04]">
                       <TableRow>
-                        <TableHead className="w-[4%] text-center">Folio</TableHead>
-                        <TableHead className="w-[14%] text-center">Cliente</TableHead>
-                        <TableHead className="w-[16%]">Dirección</TableHead>
+                        <TableHead className="w-[9%] text-center">Folio</TableHead>
+                        <TableHead className="w-[12%] text-center">Cliente</TableHead>
+                        <TableHead className="w-[14%]">Dirección</TableHead>
                         <TableHead className="w-[7%] text-center">Teléfono</TableHead>
                         <TableHead className="w-[7%] text-center">Fecha de reporte</TableHead>
-                        <TableHead className="w-[16%]">Reporte</TableHead>
+                        <TableHead className="w-[15%]">Reporte</TableHead>
                         <TableHead className="w-[13%]">Observaciones</TableHead>
                         <TableHead className="w-[5%] text-center">Evidencias</TableHead>
                         <TableHead className="w-[7%] text-center">Responsable</TableHead>
@@ -310,7 +310,7 @@ export default function Reportes() {
                         <TableRow key={row.folio} className="align-middle">
                           <TableCell className="align-middle px-2 text-center whitespace-nowrap">
                             <div className="flex justify-center">
-                              <FolioCell folio={row.folio} onUpdated={load} />
+                              <FolioCell folio={row.folio} onUpdated={handleUpdated} />
                             </div>
                           </TableCell>
                           <TableCell className="align-middle px-3 py-3 text-center">
@@ -352,7 +352,7 @@ export default function Reportes() {
                               <TelefonoCell
                                 folio={row.folio}
                                 telefono={row.telefono}
-                                onUpdated={load}
+                                onUpdated={handleUpdated}
                               />
                             </div>
                           </TableCell>
@@ -382,7 +382,7 @@ export default function Reportes() {
                               <ObservacionesCell
                                 folio={row.folio}
                                 observaciones={row.observaciones}
-                                onUpdated={load}
+                                onUpdated={handleUpdated}
                               />
                             </div>
                           </TableCell>
@@ -392,7 +392,7 @@ export default function Reportes() {
                               <EvidenceUpload
                                 folio={row.folio}
                                 evidencias={row.evidencias}
-                                onUpdated={load}
+                                onUpdated={handleUpdated}
                               />
                             </div>
                           </TableCell>
@@ -413,7 +413,7 @@ export default function Reportes() {
                               <ResponsableCell
                                 folio={row.folio}
                                 responsable={row.responsable}
-                                onUpdated={load}
+                                onUpdated={handleUpdated}
                               />
                             </div>
                           </TableCell>
@@ -423,7 +423,7 @@ export default function Reportes() {
                               <FechaReparacion
                                 folio={row.folio}
                                 fecha={row.fechaReparacion}
-                                onUpdated={load}
+                                onUpdated={handleUpdated}
                               />
                             </div>
                           </TableCell>
@@ -445,7 +445,7 @@ export default function Reportes() {
                               <FirmaUpload
                                 folio={row.folio}
                                 firma={row.firma}
-                                onUpdated={load}
+                                onUpdated={handleUpdated}
                               />
                             </div>
                           </TableCell>

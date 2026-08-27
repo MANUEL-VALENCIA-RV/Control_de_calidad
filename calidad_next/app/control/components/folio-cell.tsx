@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { CellRead, CellEdit } from "@/components/editable-cell";
+import { CellEdit } from "@/components/editable-cell";
 import type { ReportRow } from "@/lib/reports";
 
 export function FolioCell({ folio, onUpdated }: { folio: string; onUpdated: (oldFolio: string, row: ReportRow) => void }) {
@@ -31,5 +31,14 @@ export function FolioCell({ folio, onUpdated }: { folio: string; onUpdated: (old
   };
 
   if (editing) return <CellEdit value={value} onChange={setValue} onSave={save} onCancel={cancel} saving={saving} error={error} placeholder="Folio" inputClassName="tabular-nums font-semibold" />;
-  return <CellRead value={folio} placeholder="Sin folio" onEdit={start} className="font-semibold tabular-nums" />;
+  return (
+    <button
+      type="button"
+      onClick={start}
+      className="max-w-full whitespace-nowrap rounded px-1 py-0.5 text-xs font-semibold text-foreground tabular-nums transition hover:bg-white/5"
+      title={folio || "Sin folio"}
+    >
+      {folio || "Sin folio"}
+    </button>
+  );
 }
