@@ -46,19 +46,19 @@ const statusOptions: {
   value: StatusFilter;
   label: string;
 }[] = [
-    {
-      value: "todos",
-      label: "Todos",
-    },
-    {
-      value: "terminados",
-      label: "Terminados",
-    },
-    {
-      value: "pendientes",
-      label: "Pendientes",
-    },
-  ];
+  {
+    value: "todos",
+    label: "Todos",
+  },
+  {
+    value: "terminados",
+    label: "Terminados",
+  },
+  {
+    value: "pendientes",
+    label: "Pendientes",
+  },
+];
 
 const PAGE_SIZE = 8;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -83,7 +83,7 @@ export default function Reportes() {
 
   const requestRef = useRef(0);
 
-  // Debounce del buscador: no golpear al servidor en cada tecla.
+  // Debounce del buscador
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
@@ -97,7 +97,6 @@ export default function Reportes() {
     const key = `page:${page}|${PAGE_SIZE}|${debouncedQuery}|${status}`;
     const requestId = ++requestRef.current;
 
-    // Stale-while-revalidate: muestra el caché al instante y revalida.
     const cached = readCache<{
       data: ReportRow[];
       total: number;
@@ -126,6 +125,7 @@ export default function Reportes() {
 
       setReports(result.data);
       setTotal(result.total);
+
       writeCache(key, {
         data: result.data,
         total: result.total,
@@ -133,9 +133,13 @@ export default function Reportes() {
     } catch (error) {
       if (requestId !== requestRef.current) return;
 
-      if (!cached) setReports([]);
+      if (!cached) {
+        setReports([]);
+      }
 
-      setError(error instanceof Error ? error.message : "Error desconocido");
+      setError(
+        error instanceof Error ? error.message : "Error desconocido",
+      );
     } finally {
       if (requestId === requestRef.current) {
         setLoading(false);
@@ -147,12 +151,16 @@ export default function Reportes() {
     load();
   }, [load]);
 
-  // Actualiza solo la fila editada en el estado local (sin recargar todo).
-  const handleUpdated = useCallback((oldFolio: string, row: ReportRow) => {
-    invalidateCache();
+  const handleUpdated = useCallback(
+    (oldFolio: string, row: ReportRow) => {
+      invalidateCache();
 
-    setReports((prev) => prev.map((r) => (r.folio === oldFolio ? row : r)));
-  }, []);
+      setReports((prev) =>
+        prev.map((r) => (r.folio === oldFolio ? row : r)),
+      );
+    },
+    [],
+  );
 
   const pageCount = useMemo(
     () => Math.max(1, Math.ceil(total / PAGE_SIZE)),
@@ -167,7 +175,8 @@ export default function Reportes() {
 
   const safePage = Math.min(page, pageCount);
 
-  const startItem = total > 0 ? (safePage - 1) * PAGE_SIZE + 1 : 0;
+  const startItem =
+    total > 0 ? (safePage - 1) * PAGE_SIZE + 1 : 0;
 
   const endItem = Math.min(safePage * PAGE_SIZE, total);
 
@@ -176,6 +185,7 @@ export default function Reportes() {
       <AppHeader />
 
       <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-5 px-4 py-5 md:px-6">
+        {/* Encabezado */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-semibold text-foreground">
@@ -196,7 +206,9 @@ export default function Reportes() {
         <Card className="border-none bg-gradient-to-b from-[#1d2f5e] via-[#16233f] to-[#101a30] shadow-[0_8px_40px_rgba(2,0,52,0.35)]">
           <CardHeader className="gap-4 px-5 pt-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
             <div className="flex min-w-0 flex-col gap-0.5">
-              <CardTitle>Viviendas y Desarrollo de Teziutlán</CardTitle>
+              <CardTitle>
+                Viviendas y Desarrollo de Teziutlán
+              </CardTitle>
 
               <CardDescription>
                 Control de Calidad &middot; Reportes de reparación
@@ -204,6 +216,7 @@ export default function Reportes() {
             </div>
 
             <div className="flex w-full flex-col gap-2 md:w-auto md:shrink-0 md:flex-row md:items-center">
+              {/* Buscador */}
               <div className="relative w-full md:w-64">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
@@ -212,7 +225,6 @@ export default function Reportes() {
                   value={query}
                   onChange={(event) => {
                     setQuery(event.target.value);
-
                     setPage(1);
                   }}
                   placeholder="Buscar por folio, cliente o reporte..."
@@ -220,6 +232,7 @@ export default function Reportes() {
                 />
               </div>
 
+              {/* Filtros */}
               <div className="flex items-center gap-1 self-start rounded-lg bg-white/[0.06] p-1 md:self-auto">
                 {statusOptions.map((option) => (
                   <button
@@ -227,13 +240,13 @@ export default function Reportes() {
                     type="button"
                     onClick={() => {
                       setStatus(option.value);
-
                       setPage(1);
                     }}
-                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-100 ${status === option.value
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                      }`}
+                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-100 ${
+                      status === option.value
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -283,13 +296,14 @@ export default function Reportes() {
                 </p>
 
                 <p className="text-xs text-muted-foreground">
-                  No se encontraron reportes con los filtros aplicados.
+                  No se encontraron reportes con los filtros
+                  aplicados.
                 </p>
               </div>
             ) : (
               <>
                 <div className="w-full overflow-x-auto overscroll-x-contain">
-                  <Table className="min-w-[1840px] table-fixed">
+                  <Table className="min-w-[1970px] table-fixed">
                     <colgroup>
                       <col className="w-[120px]" />
                       <col className="w-[200px]" />
@@ -298,68 +312,123 @@ export default function Reportes() {
                       <col className="w-[140px]" />
                       <col className="w-[300px]" />
                       <col className="w-[250px]" />
+
+                      {/* Evidencias */}
                       <col className="w-[130px]" />
+
+                      {/* Responsable */}
                       <col className="w-[165px]" />
+
+                      {/* Fecha reparación */}
                       <col className="w-[155px]" />
+
+                      {/* Firma */}
+                      <col className="w-[130px]" />
+
+                      {/* Estado */}
                       <col className="w-[125px]" />
                     </colgroup>
+
                     <TableHeader className="bg-white/[0.04]">
                       <TableRow>
-                        <TableHead className="text-center">Folio</TableHead>
-                        <TableHead className="text-center">Cliente</TableHead>
+                        <TableHead className="text-center">
+                          Folio
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          Cliente
+                        </TableHead>
+
                         <TableHead>Dirección</TableHead>
-                        <TableHead className="text-center">Teléfono</TableHead>
-                        <TableHead className="text-center">Fecha de reporte</TableHead>
+
+                        <TableHead className="text-center">
+                          Teléfono
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          Fecha de reporte
+                        </TableHead>
+
                         <TableHead>Reporte</TableHead>
+
                         <TableHead>Observaciones</TableHead>
-                        <TableHead className="text-center">Evidencias</TableHead>
-                        <TableHead className="text-center">Responsable</TableHead>
-                        <TableHead className="text-center">Fecha de reparación</TableHead>
-                        <TableHead className="text-center">Estado</TableHead>
+
+                        <TableHead className="text-center">
+                          Evidencias
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          Responsable
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          Fecha de reparación
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          Firma
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          Estado
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
+
                     <TableBody>
                       {reports.map((row) => (
-                        <TableRow key={row.folio} className="align-middle">
+                        <TableRow
+                          key={row.folio}
+                          className="align-middle"
+                        >
+                          {/* Folio */}
                           <TableCell className="align-middle px-3 py-3 text-center whitespace-nowrap">
                             <div className="flex min-w-0 justify-center">
-                              <FolioCell folio={row.folio} onUpdated={handleUpdated} />
+                              <FolioCell
+                                folio={row.folio}
+                                onUpdated={handleUpdated}
+                              />
                             </div>
                           </TableCell>
+
+                          {/* Cliente */}
                           <TableCell className="align-middle px-3 py-3 text-center">
                             <div
                               className="
-                                                                    mx-auto
-                                                                    line-clamp-2
-                                                                    max-w-full
-                                                                    whitespace-normal
-                                                                    break-normal
-                                                                    text-center
-                                                                    font-medium
-                                                                    leading-[1.35]
-                                                                    text-foreground
-                                                                "
+                                mx-auto
+                                line-clamp-2
+                                max-w-full
+                                whitespace-normal
+                                break-normal
+                                text-center
+                                font-medium
+                                leading-[1.35]
+                                text-foreground
+                              "
                               title={row.cliente}
                             >
                               {row.cliente}
                             </div>
                           </TableCell>
+
+                          {/* Dirección */}
                           <TableCell className="min-w-0 align-middle px-3 py-3 text-left">
                             <div
                               className="
-                                                                    line-clamp-3
-                                                                    whitespace-normal
-                                                                    break-normal
-                                                                    text-left
-                                                                    leading-[1.4]
-                                                                    text-muted-foreground
-                                                                "
+                                line-clamp-3
+                                whitespace-normal
+                                break-normal
+                                text-left
+                                leading-[1.4]
+                                text-muted-foreground
+                              "
                               title={row.direccion}
                             >
                               {row.direccion}
                             </div>
                           </TableCell>
 
+                          {/* Teléfono */}
                           <TableCell className="align-middle px-2 text-center whitespace-nowrap">
                             <div className="flex justify-center">
                               <TelefonoCell
@@ -370,36 +439,42 @@ export default function Reportes() {
                             </div>
                           </TableCell>
 
+                          {/* Fecha reporte */}
                           <TableCell className="align-middle px-2 text-center whitespace-nowrap text-muted-foreground tabular-nums">
                             {row.fechaReporte}
                           </TableCell>
 
+                          {/* Reporte */}
                           <TableCell className="min-w-0 align-middle px-3 py-3 text-left">
                             <div
                               className="
-                                                                    line-clamp-3
-                                                                    whitespace-pre-line
-                                                                    break-normal
-                                                                    text-left
-                                                                    leading-[1.4]
-                                                                    text-foreground
-                                                                "
+                                line-clamp-3
+                                whitespace-pre-line
+                                break-normal
+                                text-left
+                                leading-[1.4]
+                                text-foreground
+                              "
                               title={row.reporte}
                             >
                               {row.reporte}
                             </div>
                           </TableCell>
 
+                          {/* Observaciones */}
                           <TableCell className="min-w-0 align-middle px-3 py-3 text-left">
                             <div className="whitespace-normal break-normal text-left leading-[1.4] text-muted-foreground">
                               <ObservacionesCell
                                 folio={row.folio}
-                                observaciones={row.observaciones}
+                                observaciones={
+                                  row.observaciones
+                                }
                                 onUpdated={handleUpdated}
                               />
                             </div>
                           </TableCell>
 
+                          {/* Evidencias */}
                           <TableCell className="align-middle px-3 py-3 text-center">
                             <div className="flex min-w-0 items-center justify-center">
                               <EvidenceUpload
@@ -410,18 +485,19 @@ export default function Reportes() {
                             </div>
                           </TableCell>
 
+                          {/* Responsable */}
                           <TableCell className="min-w-0 align-middle px-2 py-3 text-center">
                             <div
                               className="
-                                                                    mx-auto
-                                                                    line-clamp-2
-                                                                    max-w-full
-                                                                    whitespace-normal
-                                                                    break-normal
-                                                                    text-center
-                                                                    leading-[1.35]
-                                                                    text-muted-foreground
-                                                                "
+                                mx-auto
+                                line-clamp-2
+                                max-w-full
+                                whitespace-normal
+                                break-normal
+                                text-center
+                                leading-[1.35]
+                                text-muted-foreground
+                              "
                             >
                               <ResponsableCell
                                 folio={row.folio}
@@ -431,6 +507,7 @@ export default function Reportes() {
                             </div>
                           </TableCell>
 
+                          {/* Fecha reparación */}
                           <TableCell className="align-middle px-2 text-center whitespace-nowrap">
                             <div className="flex items-center justify-center">
                               <FechaReparacion
@@ -441,8 +518,20 @@ export default function Reportes() {
                             </div>
                           </TableCell>
 
+                          {/* FIRMA */}
+                          <TableCell className="align-middle px-3 py-3 text-center">
+                            <div className="flex min-w-0 items-center justify-center">
+                              <FirmaUpload
+                                folio={row.folio}
+                                firma={row.firma}
+                                onUpdated={handleUpdated}
+                              />
+                            </div>
+                          </TableCell>
+
+                          {/* ESTADO */}
                           <TableCell className="align-middle px-2 py-3 text-center">
-                            <div className="flex min-w-0 flex-col items-center gap-1">
+                            <div className="flex min-w-0 items-center justify-center">
                               {row.terminado ? (
                                 <Badge className="w-full max-w-[80px] justify-center gap-1 bg-green-500/15 text-[10px] text-green-400">
                                   <span className="size-1.5 shrink-0 rounded-full bg-green-400" />
@@ -454,12 +543,6 @@ export default function Reportes() {
                                   Pendiente
                                 </Badge>
                               )}
-
-                              <FirmaUpload
-                                folio={row.folio}
-                                firma={row.firma}
-                                onUpdated={handleUpdated}
-                              />
                             </div>
                           </TableCell>
                         </TableRow>
@@ -468,9 +551,11 @@ export default function Reportes() {
                   </Table>
                 </div>
 
+                {/* Paginación */}
                 <div className="flex flex-col gap-3 border-t border-white/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-xs text-muted-foreground tabular-nums">
-                    Mostrando {startItem}–{endItem} de {total} reportes
+                    Mostrando {startItem}–{endItem} de {total}{" "}
+                    reportes
                   </p>
 
                   <div className="flex items-center gap-2">
@@ -478,7 +563,9 @@ export default function Reportes() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => setPage(safePage - 1)}
+                      onClick={() =>
+                        setPage(safePage - 1)
+                      }
                       disabled={safePage <= 1}
                     >
                       <ChevronLeft className="size-4" />
@@ -493,7 +580,9 @@ export default function Reportes() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => setPage(safePage + 1)}
+                      onClick={() =>
+                        setPage(safePage + 1)
+                      }
                       disabled={safePage >= pageCount}
                     >
                       Siguiente
