@@ -27,10 +27,9 @@ export function FirmaUpload({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hovered, setHovered] = useState(false);
-
-  const firmaUrl = firma
-    ? `/api/firma/${encodeURIComponent(firma)}`
-    : "";
+const firmaUrl = firma
+  ? `/api/evidencias/${encodeURIComponent(firma)}`
+  : "";
 
   async function change(
     e: ChangeEvent<HTMLInputElement>,
