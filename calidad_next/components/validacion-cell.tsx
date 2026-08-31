@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export type Validacion = "pendiente" | "conforme" | "no_conforme";
 
 type Props = {
-  folio: string;
+  id: number;
   validacion: Validacion;
   responsable?: string | null;
   fechaReparacion?: string | null;
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function ValidacionCell({
-  folio,
+  id,
   validacion,
   responsable,
   fechaReparacion,
@@ -67,7 +67,7 @@ export function ValidacionCell({
 
     try {
       const response = await fetch(
-        `/api/reportes/${encodeURIComponent(folio)}`,
+        `/api/reportes/${encodeURIComponent(String(id))}`,
         {
           method: "PATCH",
           headers: {
@@ -172,7 +172,7 @@ export function ValidacionCell({
                     : "Confirmar no conformidad"}
                 </h2>
 
-                <p className="text-xs text-muted-foreground">Folio {folio}</p>
+                <p className="text-xs text-muted-foreground">ID {id}</p>
               </div>
             </div>
 

@@ -6,12 +6,12 @@ import { TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Props = {
-  folio: string;
+  id: number;
   anomalia: boolean;
   onUpdated: () => void;
 };
 
-export function AnomaliaCell({ folio, anomalia, onUpdated }: Props) {
+export function AnomaliaCell({ id, anomalia, onUpdated }: Props) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -22,7 +22,7 @@ export function AnomaliaCell({ folio, anomalia, onUpdated }: Props) {
 
     try {
       const response = await fetch(
-        `/api/reportes/${encodeURIComponent(folio)}`,
+        `/api/reportes/${encodeURIComponent(String(id))}`,
         {
           method: "PATCH",
           headers: {
@@ -85,7 +85,7 @@ export function AnomaliaCell({ folio, anomalia, onUpdated }: Props) {
                   {anomalia ? "Quitar anomalía" : "Confirmar anomalía"}
                 </h2>
 
-                <p className="text-xs text-muted-foreground">Folio {folio}</p>
+                <p className="text-xs text-muted-foreground">ID {id}</p>
               </div>
             </div>
 

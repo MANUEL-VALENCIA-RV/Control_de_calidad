@@ -163,7 +163,7 @@ export default function Dashboard() {
                     (report) => !report.terminado,
                 )
                 .map((report) => ({
-                    folio: report.folio,
+                    id: report.id,
                     reporte:
                         report.reporte ||
                         "Sin descripción",
@@ -466,14 +466,10 @@ export default function Dashboard() {
                             ) : (
                                 <div className="flex flex-1 flex-col overflow-hidden">
                                     <div className="w-full overflow-x-auto">
-                                        <table className="w-full min-w-[680px] table-fixed text-sm">
+                                        <table className="w-full min-w-[560px] table-fixed text-sm">
                                             <thead>
                                                 <tr className="border-b border-white/10 text-left text-xs font-semibold tracking-wider text-foreground/75 uppercase">
-                                                    <th className="w-[12%] px-4 py-3">
-                                                        Folio
-                                                    </th>
-
-                                                    <th className="w-[35%] px-4 py-3">
+                                                    <th className="w-[47%] px-4 py-3">
                                                         Reporte
                                                     </th>
 
@@ -498,16 +494,10 @@ export default function Dashboard() {
                                                     ) => (
                                                         <tr
                                                             key={
-                                                                report.folio
+                                                                report.id
                                                             }
                                                             className="border-b border-white/5 transition-colors hover:bg-white/[0.04]"
                                                         >
-                                                            <td className="px-4 py-4 align-top font-semibold text-foreground tabular-nums">
-                                                                {
-                                                                    report.folio
-                                                                }
-                                                            </td>
-
                                                             <td className="px-4 py-4 align-top whitespace-normal break-words text-foreground">
                                                                 {
                                                                     report.reporte

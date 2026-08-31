@@ -27,7 +27,6 @@ import { EvidenceUpload } from "@/components/evidence-upload";
 import { FechaReparacion } from "@/components/fecha-reparacion";
 import { FirmaUpload } from "@/components/firma-upload";
 import { NuevoReporte } from "@/components/nuevo-reporte";
-import { FolioCell } from "@/app/control/components/folio-cell";
 import { ObservacionesCell } from "@/app/control/components/observaciones-cell";
 import { ResponsableCell } from "@/app/control/components/responsable-cell";
 import { TelefonoCell } from "@/app/control/components/telefono-cell";
@@ -152,11 +151,11 @@ export default function Reportes() {
   }, [load]);
 
   const handleUpdated = useCallback(
-    (oldFolio: string, row: ReportRow) => {
+    (oldId: number, row: ReportRow) => {
       invalidateCache();
 
       setReports((prev) =>
-        prev.map((r) => (r.folio === oldFolio ? row : r)),
+        prev.map((r) => (r.id === oldId ? row : r)),
       );
     },
     [],
@@ -227,7 +226,7 @@ export default function Reportes() {
                     setQuery(event.target.value);
                     setPage(1);
                   }}
-                  placeholder="Buscar por folio, cliente o reporte..."
+                  placeholder="Buscar por cliente o reporte..."
                   className="pl-9"
                 />
               </div>
@@ -303,9 +302,8 @@ export default function Reportes() {
             ) : (
               <>
                 <div className="w-full overflow-x-auto overscroll-x-contain">
-                  <Table className="min-w-[1970px] table-fixed">
+                  <Table className="min-w-[1850px] table-fixed">
                     <colgroup>
-                      <col className="w-[120px]" />
                       <col className="w-[200px]" />
                       <col className="w-[230px]" />
                       <col className="w-[125px]" />
@@ -331,10 +329,6 @@ export default function Reportes() {
 
                     <TableHeader className="bg-white/[0.04]">
                       <TableRow>
-                        <TableHead className="text-center">
-                          Folio
-                        </TableHead>
-
                         <TableHead className="text-center">
                           Cliente
                         </TableHead>
@@ -378,19 +372,9 @@ export default function Reportes() {
                     <TableBody>
                       {reports.map((row) => (
                         <TableRow
-                          key={row.folio}
+                          key={row.id}
                           className="align-middle"
                         >
-                          {/* Folio */}
-                          <TableCell className="align-middle px-3 py-3 text-center whitespace-nowrap">
-                            <div className="flex min-w-0 justify-center">
-                              <FolioCell
-                                folio={row.folio}
-                                onUpdated={handleUpdated}
-                              />
-                            </div>
-                          </TableCell>
-
                           {/* Cliente */}
                           <TableCell className="align-middle px-3 py-3 text-center">
                             <div
@@ -432,7 +416,7 @@ export default function Reportes() {
                           <TableCell className="align-middle px-2 text-center whitespace-nowrap">
                             <div className="flex justify-center">
                               <TelefonoCell
-                                folio={row.folio}
+                                id={row.id}
                                 telefono={row.telefono}
                                 onUpdated={handleUpdated}
                               />
@@ -465,7 +449,7 @@ export default function Reportes() {
                           <TableCell className="min-w-0 align-middle px-3 py-3 text-left">
                             <div className="whitespace-normal break-normal text-left leading-[1.4] text-muted-foreground">
                               <ObservacionesCell
-                                folio={row.folio}
+                                id={row.id}
                                 observaciones={
                                   row.observaciones
                                 }
@@ -478,7 +462,7 @@ export default function Reportes() {
                           <TableCell className="align-middle px-3 py-3 text-center">
                             <div className="flex min-w-0 items-center justify-center">
                               <EvidenceUpload
-                                folio={row.folio}
+                                id={row.id}
                                 evidencias={row.evidencias}
                                 onUpdated={handleUpdated}
                               />
@@ -500,7 +484,7 @@ export default function Reportes() {
                               "
                             >
                               <ResponsableCell
-                                folio={row.folio}
+                                id={row.id}
                                 responsable={row.responsable}
                                 onUpdated={handleUpdated}
                               />
@@ -511,7 +495,7 @@ export default function Reportes() {
                           <TableCell className="align-middle px-2 text-center whitespace-nowrap">
                             <div className="flex items-center justify-center">
                               <FechaReparacion
-                                folio={row.folio}
+                                id={row.id}
                                 fecha={row.fechaReparacion}
                                 onUpdated={handleUpdated}
                               />
@@ -522,7 +506,7 @@ export default function Reportes() {
                           <TableCell className="align-middle px-3 py-3 text-center">
                             <div className="flex min-w-0 items-center justify-center">
                               <FirmaUpload
-                                folio={row.folio}
+                                id={row.id}
                                 firma={row.firma}
                                 onUpdated={handleUpdated}
                               />

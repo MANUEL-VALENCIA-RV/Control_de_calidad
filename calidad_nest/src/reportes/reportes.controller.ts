@@ -76,10 +76,10 @@ export class ReportesController {
   // EVIDENCIAS
   // =========================================================
 
-  @Post(':folio/evidencias')
+  @Post(':id/evidencias')
   @UseInterceptors(FileInterceptor('file', UPLOAD_OPTIONS))
   async addEvidencia(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File | undefined,
   ) {
     if (!file) {
@@ -89,20 +89,20 @@ export class ReportesController {
     const fileId = await this.driveService.uploadFile(file);
 
     try {
-      return await this.reportesService.addEvidencia(folio, fileId);
+      return await this.reportesService.addEvidencia(Number(id), fileId);
     } catch (error) {
       await this.driveService.deleteFile(fileId).catch(() => {});
       throw error;
     }
   }
 
-  @Delete(':folio/evidencias/:fileId')
+  @Delete(':id/evidencias/:fileId')
   async removeEvidencia(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @Param('fileId') fileId: string,
   ) {
     const reporte = await this.reportesService.removeEvidencia(
-      folio,
+      Number(id),
       fileId,
     );
 
@@ -135,16 +135,16 @@ export class ReportesController {
   // =========================================================
 
   // MOSTRAR / DESCARGAR FIRMA
-  @Get(':folio/firma')
+  @Get(':id/firma')
   async getFirma(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @Res() res: Response,
   ) {
-    const fileId = await this.reportesService.getFirma(folio);
+    const fileId = await this.reportesService.getFirma(Number(id));
 
     if (!fileId) {
       throw new BadRequestException(
-        `El reporte "${folio}" no tiene firma`,
+        `El reporte "${id}" no tiene firma`,
       );
     }
 
@@ -163,10 +163,10 @@ export class ReportesController {
   }
 
   // SUBIR FIRMA
-  @Post(':folio/firma')
+  @Post(':id/firma')
   @UseInterceptors(FileInterceptor('file', UPLOAD_OPTIONS))
   async addFirma(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File | undefined,
   ) {
     if (!file) {
@@ -176,7 +176,7 @@ export class ReportesController {
     const fileId = await this.driveService.uploadFile(file);
 
     try {
-      return await this.reportesService.addFirma(folio, fileId);
+      return await this.reportesService.addFirma(Number(id), fileId);
     } catch (error) {
       await this.driveService.deleteFile(fileId).catch(() => {});
       throw error;
@@ -184,14 +184,14 @@ export class ReportesController {
   }
 
   // ELIMINAR FIRMA
-  @Delete(':folio/firma')
+  @Delete(':id/firma')
   async removeFirma(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
   ) {
-    const fileId = await this.reportesService.getFirma(folio);
+    const fileId = await this.reportesService.getFirma(Number(id));
 
     const reporte =
-      await this.reportesService.removeFirma(folio);
+      await this.reportesService.removeFirma(Number(id));
 
     if (fileId && !fileId.startsWith('demo-firma-')) {
       await this.driveService.deleteFile(fileId).catch(() => {});
@@ -201,29 +201,16 @@ export class ReportesController {
   }
 
   // =========================================================
-  // EDITAR FOLIO
-  // =========================================================
-
-  @Patch(':folio')
-  setFolio(@Param('folio') folio: string, @Body('folio') nuevoFolio: string) {
-    if (!nuevoFolio?.trim()) {
-      throw new BadRequestException('El nuevo folio es obligatorio');
-    }
-
-    return this.reportesService.setFolio(folio, nuevoFolio.trim());
-  }
-
-  // =========================================================
   // FECHA DE REPARACIÓN
   // =========================================================
 
-  @Patch(':folio/fecha-reparacion')
+  @Patch(':id/fecha-reparacion')
   setFechaReparacion(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @Body('fecha') fecha: string,
   ) {
     return this.reportesService.setFechaReparacion(
-      folio,
+      Number(id),
       fecha ?? '',
     );
   }
@@ -232,13 +219,13 @@ export class ReportesController {
   // OBSERVACIONES
   // =========================================================
 
-  @Patch(':folio/observaciones')
+  @Patch(':id/observaciones')
   setObservaciones(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @Body('observaciones') observaciones: string,
   ) {
     return this.reportesService.setObservaciones(
-      folio,
+      Number(id),
       observaciones ?? '',
     );
   }
@@ -247,13 +234,13 @@ export class ReportesController {
   // TELEFONO
   // =========================================================
 
-  @Patch(':folio/telefono')
+  @Patch(':id/telefono')
   setTelefono(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @Body('telefono') telefono: string,
   ) {
     return this.reportesService.setTelefono(
-      folio,
+      Number(id),
       telefono ?? '',
     );
   }
@@ -262,13 +249,13 @@ export class ReportesController {
   // RESPONSABLE
   // =========================================================
 
-  @Patch(':folio/responsable')
+  @Patch(':id/responsable')
   setResponsable(
-    @Param('folio') folio: string,
+    @Param('id') id: string,
     @Body('responsable') responsable: string,
   ) {
     return this.reportesService.setResponsable(
-      folio,
+      Number(id),
       responsable ?? '',
     );
   }

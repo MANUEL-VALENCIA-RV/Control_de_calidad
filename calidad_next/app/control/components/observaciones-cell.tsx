@@ -4,7 +4,7 @@ import { updateObservaciones } from "@/lib/reports";
 import { CellRead, CellEdit } from "@/components/editable-cell";
 import type { ReportRow } from "@/lib/reports";
 
-export function ObservacionesCell({ folio, observaciones, onUpdated }: { folio: string; observaciones: string; onUpdated: (oldFolio: string, row: ReportRow) => void }) {
+export function ObservacionesCell({ id, observaciones, onUpdated }: { id: number; observaciones: string; onUpdated: (oldId: number, row: ReportRow) => void }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(observaciones || "");
   const [saving, setSaving] = useState(false);
@@ -15,9 +15,9 @@ export function ObservacionesCell({ folio, observaciones, onUpdated }: { folio: 
   const save = async () => {
     setSaving(true); setError("");
     try {
-      const row = await updateObservaciones(folio, value) as ReportRow;
+      const row = await updateObservaciones(id, value) as ReportRow;
       setEditing(false);
-      onUpdated(folio, row);
+      onUpdated(id, row);
     }
     catch { setError("Error al guardar"); }
     finally { setSaving(false); }

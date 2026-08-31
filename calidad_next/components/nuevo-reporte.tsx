@@ -99,10 +99,6 @@ export function NuevoReporte({
       >
         <h2 className="mb-4 text-lg font-semibold">Nuevo reporte</h2>
 
-        <p className="mb-4 text-sm text-muted-foreground">
-          El folio se genera automáticamente (formato: MESddA-NN, ej. AGO246-02)
-        </p>
-
         <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <Label htmlFor="cliente">Cliente</Label>

@@ -4,7 +4,7 @@ import { updateFechaReparacion } from "@/lib/reports";
 import { CellRead, CellEdit } from "@/components/editable-cell";
 import type { ReportRow } from "@/lib/reports";
 
-export function FechaReparacion({ folio, fecha, onUpdated }: { folio: string; fecha: string; onUpdated: (oldFolio: string, row: ReportRow) => void }) {
+export function FechaReparacion({ id, fecha, onUpdated }: { id: number; fecha: string; onUpdated: (oldId: number, row: ReportRow) => void }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(fecha || "");
   const [saving, setSaving] = useState(false);
@@ -21,9 +21,9 @@ export function FechaReparacion({ folio, fecha, onUpdated }: { folio: string; fe
   const save = async () => {
     setSaving(true); setError("");
     try {
-      const row = await updateFechaReparacion(folio, value) as ReportRow;
+      const row = await updateFechaReparacion(id, value) as ReportRow;
       setEditing(false);
-      onUpdated(folio, row);
+      onUpdated(id, row);
     }
     catch (e) { setError(e instanceof Error ? e.message : "Error al guardar"); }
     finally { setSaving(false); }

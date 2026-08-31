@@ -1,5 +1,5 @@
 export interface ReportRow {
-  folio: string;
+  id: number;
   cliente: string;
   direccion: string;
   telefono: string;
@@ -86,8 +86,8 @@ async function readJson(res: Response): Promise<any> {
   try { return JSON.parse(text); } catch { return { error: text }; }
 }
 
-async function patchReport(folio: string, action: string, body: JsonObject) {
-  const res = await fetch(`/api/reportes/${encodeURIComponent(folio)}/${action}`, {
+async function patchReport(id: number, action: string, body: JsonObject) {
+  const res = await fetch(`/api/reportes/${encodeURIComponent(String(id))}/${action}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -97,30 +97,27 @@ async function patchReport(folio: string, action: string, body: JsonObject) {
   return data;
 }
 
-export const updateObservaciones = (folio: string, observaciones: string) =>
-  patchReport(folio, "observaciones", { observaciones });
+export const updateObservaciones = (id: number, observaciones: string) =>
+  patchReport(id, "observaciones", { observaciones });
 
-export const updateResponsable = (folio: string, responsable: string) =>
-  patchReport(folio, "responsable", { responsable });
+export const updateResponsable = (id: number, responsable: string) =>
+  patchReport(id, "responsable", { responsable });
 
-export const updateFechaReparacion = (folio: string, fecha: string) =>
-  patchReport(folio, "fecha-reparacion", { fecha });
+export const updateFechaReparacion = (id: number, fecha: string) =>
+  patchReport(id, "fecha-reparacion", { fecha });
 
-export const updateTelefono = (folio: string, telefono: string) =>
-  patchReport(folio, "telefono", { telefono });
+export const updateTelefono = (id: number, telefono: string) =>
+  patchReport(id, "telefono", { telefono });
 
-export const updateFolio = (folio: string, nuevoFolio: string) =>
-  patchReport(folio, "", { folio: nuevoFolio });
-
-export async function deleteFirma(folio: string) {
-  const res = await fetch(`/api/reportes/${encodeURIComponent(folio)}/firma`, { method: "DELETE" });
+export async function deleteFirma(id: number) {
+  const res = await fetch(`/api/reportes/${encodeURIComponent(String(id))}/firma`, { method: "DELETE" });
   const data = await readJson(res);
   if (!res.ok) throw new Error(data?.error || data?.message || "Error al eliminar firma");
   return data;
 }
 
-export async function deleteEvidencia(folio: string, fileId: string) {
-  const res = await fetch(`/api/reportes/${encodeURIComponent(folio)}/evidencias`, {
+export async function deleteEvidencia(id: number, fileId: string) {
+  const res = await fetch(`/api/reportes/${encodeURIComponent(String(id))}/evidencias`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fileId }),

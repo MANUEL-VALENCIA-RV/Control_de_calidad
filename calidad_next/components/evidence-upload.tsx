@@ -137,13 +137,13 @@ function EvidencePreview({
 
 function EvidenceImageViewer({
   evidencias,
-  folio,
+  id,
   index,
   onClose,
   onDeleted,
 }: {
   evidencias: string[];
-  folio: string;
+  id: number;
   index: number;
   onClose: () => void;
   onDeleted: (row: ReportRow) => void;
@@ -163,7 +163,7 @@ function EvidenceImageViewer({
 
     setDeleting(true);
     try {
-      const row = (await deleteEvidencia(folio, fileId)) as ReportRow;
+      const row = (await deleteEvidencia(id, fileId)) as ReportRow;
       onDeleted(row);
       const remaining = row.evidencias?.length ?? 0;
       if (remaining <= 0) onClose();
@@ -297,13 +297,13 @@ function useFloatingPosition(
 }
 
 export function EvidenceUpload({
-  folio,
+  id,
   evidencias,
   onUpdated,
 }: {
-  folio: string;
+  id: number;
   evidencias: string[];
-  onUpdated: (oldFolio: string, row: ReportRow) => void;
+  onUpdated: (oldId: number, row: ReportRow) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -339,7 +339,7 @@ export function EvidenceUpload({
         formData.append("file", file);
 
         const response = await fetch(
-          `/api/reportes/${encodeURIComponent(folio)}/evidencias`,
+          `/api/reportes/${encodeURIComponent(String(id))}/evidencias`,
           { method: "POST", body: formData },
         );
         const data = await response.json().catch(() => ({}));
@@ -352,7 +352,7 @@ export function EvidenceUpload({
         row = data as ReportRow;
       }
 
-      if (row) onUpdated(folio, row);
+      if (row) onUpdated(id, row);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al subir");
     } finally {
@@ -482,10 +482,10 @@ export function EvidenceUpload({
         createPortal(
           <EvidenceImageViewer
             evidencias={visible}
-            folio={folio}
+            id={id}
             index={viewerIndex}
             onClose={() => setViewerOpen(false)}
-            onDeleted={(row) => onUpdated(folio, row)}
+            onDeleted={(row) => onUpdated(id, row)}
           />,
           document.body,
         )}

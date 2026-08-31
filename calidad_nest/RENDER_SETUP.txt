@@ -36,14 +36,14 @@ FRONTEND EN VERCEL:
   AUTH_SECRET=<MISMO valor que en Render/Nest>
 
 SUBIDA DE ARCHIVOS:
-  POST /reportes/:folio/evidencias
+  POST /reportes/:id/evidencias
   Content-Type: multipart/form-data
   Campo del archivo: file
   Maximo: 10 MB
   Solo MIME image/*
 
 FIRMA:
-  POST /reportes/:folio/firma
+  POST /reportes/:id/firma
   Content-Type: multipart/form-data
   Campo del archivo: file
 

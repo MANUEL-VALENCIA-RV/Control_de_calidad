@@ -4,7 +4,7 @@ import { updateTelefono } from "@/lib/reports";
 import { CellRead, CellEdit } from "@/components/editable-cell";
 import type { ReportRow } from "@/lib/reports";
 
-export function TelefonoCell({ folio, telefono, onUpdated }: { folio: string; telefono: string; onUpdated: (oldFolio: string, row: ReportRow) => void }) {
+export function TelefonoCell({ id, telefono, onUpdated }: { id: number; telefono: string; onUpdated: (oldId: number, row: ReportRow) => void }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(telefono || "");
   const [saving, setSaving] = useState(false);
@@ -15,9 +15,9 @@ export function TelefonoCell({ folio, telefono, onUpdated }: { folio: string; te
   const save = async () => {
     setSaving(true); setError("");
     try {
-      const row = await updateTelefono(folio, value) as ReportRow;
+      const row = await updateTelefono(id, value) as ReportRow;
       setEditing(false);
-      onUpdated(folio, row);
+      onUpdated(id, row);
     }
     catch (e) { setError(e instanceof Error ? e.message : "Error al guardar"); }
     finally { setSaving(false); }

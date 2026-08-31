@@ -11,14 +11,14 @@ import { deleteFirma } from "@/lib/reports";
 import type { ReportRow } from "@/lib/reports";
 
 export function FirmaUpload({
-  folio,
+  id,
   firma,
   onUpdated,
 }: {
-  folio: string;
+  id: number;
   firma: string;
   onUpdated: (
-    oldFolio: string,
+    oldId: number,
     row: ReportRow,
   ) => void;
 }) {
@@ -47,7 +47,7 @@ const firmaUrl = firma
       fd.append("file", file);
 
       const res = await fetch(
-        `/api/reportes/${encodeURIComponent(folio)}/firma`,
+        `/api/reportes/${encodeURIComponent(String(id))}/firma`,
         {
           method: "POST",
           body: fd,
@@ -67,7 +67,7 @@ const firmaUrl = firma
       }
 
       onUpdated(
-        folio,
+        id,
         data as ReportRow,
       );
     } catch (err) {
@@ -92,10 +92,10 @@ const firmaUrl = firma
     try {
       const row =
         (await deleteFirma(
-          folio,
+          id,
         )) as ReportRow;
 
-      onUpdated(folio, row);
+      onUpdated(id, row);
     } catch (err) {
       setError(
         err instanceof Error

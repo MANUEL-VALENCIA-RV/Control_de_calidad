@@ -4,7 +4,7 @@ import { updateResponsable } from "@/lib/reports";
 import { CellRead, CellEdit } from "@/components/editable-cell";
 import type { ReportRow } from "@/lib/reports";
 
-export function ResponsableCell({ folio, responsable, onUpdated }: { folio: string; responsable: string; onUpdated: (oldFolio: string, row: ReportRow) => void }) {
+export function ResponsableCell({ id, responsable, onUpdated }: { id: number; responsable: string; onUpdated: (oldId: number, row: ReportRow) => void }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(responsable || "");
   const [saving, setSaving] = useState(false);
@@ -15,9 +15,9 @@ export function ResponsableCell({ folio, responsable, onUpdated }: { folio: stri
   const save = async () => {
     setSaving(true); setError("");
     try {
-      const row = await updateResponsable(folio, value) as ReportRow;
+      const row = await updateResponsable(id, value) as ReportRow;
       setEditing(false);
-      onUpdated(folio, row);
+      onUpdated(id, row);
     }
     catch { setError("Error al guardar"); }
     finally { setSaving(false); }
