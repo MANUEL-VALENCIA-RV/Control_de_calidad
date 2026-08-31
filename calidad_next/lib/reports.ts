@@ -4,7 +4,7 @@ export interface ReportRow {
   direccion: string;
   telefono: string;
   fechaReporte: string;
-  reporte: string;
+  reporte: string[];
   observaciones: string;
   evidencias: string[];
   responsable: string;
@@ -124,5 +124,16 @@ export async function deleteEvidencia(id: number, fileId: string) {
   });
   const data = await readJson(res);
   if (!res.ok) throw new Error(data?.error || data?.message || "Error al eliminar evidencia");
+  return data;
+}
+
+export async function addReporte(id: number, reporte: string) {
+  const res = await fetch(`/api/reportes/${encodeURIComponent(String(id))}/reporte`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reporte }),
+  });
+  const data = await readJson(res);
+  if (!res.ok) throw new Error(data?.error || data?.message || "Error al agregar reporte");
   return data;
 }

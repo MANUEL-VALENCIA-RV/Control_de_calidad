@@ -19,7 +19,7 @@ model reportes {
     direccion String
     telefono String
     fechaReporte String
-    reporte String
+    reporte String[]
     observaciones String
     evidencias String[]
     firma String

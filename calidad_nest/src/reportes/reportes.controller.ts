@@ -259,4 +259,24 @@ export class ReportesController {
       responsable ?? '',
     );
   }
+
+  // =========================================================
+  // REPORTE (historial)
+  // =========================================================
+
+  @Post(':id/reporte')
+  addReporte(
+    @Param('id') id: string,
+    @Body('reporte') reporte: string,
+  ) {
+    if (!reporte?.trim()) {
+      throw new BadRequestException(
+        'El texto del reporte es obligatorio',
+      );
+    }
+    return this.reportesService.addReporte(
+      Number(id),
+      reporte.trim(),
+    );
+  }
 }

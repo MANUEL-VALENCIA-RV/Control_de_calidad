@@ -28,6 +28,7 @@ import { FechaReparacion } from "@/components/fecha-reparacion";
 import { FirmaUpload } from "@/components/firma-upload";
 import { NuevoReporte } from "@/components/nuevo-reporte";
 import { ObservacionesCell } from "@/app/control/components/observaciones-cell";
+import { ReporteCell } from "@/app/control/components/reporte-cell";
 import { ResponsableCell } from "@/app/control/components/responsable-cell";
 import { TelefonoCell } from "@/app/control/components/telefono-cell";
 
@@ -430,19 +431,7 @@ export default function Reportes() {
 
                           {/* Reporte */}
                           <TableCell className="min-w-0 align-middle px-3 py-3 text-left">
-                            <div
-                              className="
-                                line-clamp-3
-                                whitespace-pre-line
-                                break-normal
-                                text-left
-                                leading-[1.4]
-                                text-foreground
-                              "
-                              title={row.reporte}
-                            >
-                              {row.reporte}
-                            </div>
+                            <ReporteCell id={row.id} reporte={row.reporte as unknown as string[]} onUpdated={handleUpdated} />
                           </TableCell>
 
                           {/* Observaciones */}

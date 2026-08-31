@@ -11,7 +11,7 @@ export type Reporte = {
   direccion: string;
   telefono: string;
   fechaReporte: string;
-  reporte: string;
+  reporte: string[];
   observaciones: string;
   evidencias: string[];
   firma: string;
@@ -85,12 +85,6 @@ export class ReportesService {
           },
         },
         {
-          reporte: {
-            contains: q,
-            mode: 'insensitive',
-          },
-        },
-        {
           observaciones: {
             contains: q,
             mode: 'insensitive',
@@ -138,9 +132,27 @@ export class ReportesService {
     });
   }
 
+  private normalizeReporte(
+    value: unknown,
+  ): string[] {
+    if (Array.isArray(value)) {
+      return value
+        .map((v) => String(v).trim())
+        .filter((v) => v.length > 0);
+    }
+    if (typeof value === 'string') {
+      const t = value.trim();
+      return t ? [t] : [];
+    }
+    return [];
+  }
+
   async create(
     data: Omit<Reporte, 'id'>,
   ): Promise<Reporte> {
+    const reporteArr = this.normalizeReporte(
+      (data as any).reporte,
+    );
     try {
       const reporte =
         await this.prisma.reportes.create({
@@ -149,7 +161,7 @@ export class ReportesService {
             direccion: data.direccion,
             telefono: data.telefono,
             fechaReporte: data.fechaReporte,
-            reporte: data.reporte,
+            reporte: reporteArr,
 
             observaciones:
               data.observaciones ?? '',
@@ -425,6 +437,42 @@ export class ReportesService {
         firma: '',
         terminado: false,
       },
+    });
+  }
+
+  async addReporte(
+    id: number,
+    texto: string,
+  ): Promise<Reporte> {
+    const trimmed = texto?.trim();
+    if (!trimmed) {
+      throw new NotFoundException(
+        `El texto del reporte es obligatorio`,
+      );
+    }
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: { id },
+      });
+    if (!reporte) {
+      throw new NotFoundException(
+        `No existe un reporte con id "${id}"`,
+      );
+    }
+    const actuales = Array.isArray(
+      (reporte as any).reporte,
+    )
+      ? ((reporte as any).reporte as string[])
+      : typeof (reporte as any).reporte ===
+          'string'
+        ? [(reporte as any).reporte].filter(
+            Boolean,
+          )
+        : [];
+    const nuevaLista = [...actuales, trimmed];
+    return this.prisma.reportes.update({
+      where: { id },
+      data: { reporte: nuevaLista },
     });
   }
 }

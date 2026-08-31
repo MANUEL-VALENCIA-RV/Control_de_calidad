@@ -164,9 +164,9 @@ export default function Dashboard() {
                 )
                 .map((report) => ({
                     id: report.id,
-                    reporte:
-                        report.reporte ||
-                        "Sin descripción",
+                    reporte: Array.isArray(report.reporte)
+                        ? (report.reporte as unknown as string[]).join(" | ") || "Sin descripción"
+                        : (report.reporte as unknown as string) || "Sin descripción",
                     fecha:
                         report.fechaReporte ||
                         "Sin fecha",
