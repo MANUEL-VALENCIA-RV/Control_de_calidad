@@ -43,8 +43,18 @@ export class ReportesService {
     page: number;
     pageSize: number;
   }> {
-    const page = Math.max(1, Number(params.page) || 1);
-    const pageSize = Math.min(100, Math.max(1, Number(params.pageSize) || 10));
+    const page = Math.max(
+      1,
+      Number(params.page) || 1,
+    );
+
+    const pageSize = Math.min(
+      100,
+      Math.max(
+        1,
+        Number(params.pageSize) || 10,
+      ),
+    );
 
     const where: Prisma.reportesWhereInput = {};
 
@@ -55,134 +65,296 @@ export class ReportesService {
     }
 
     const q = params.q?.trim();
+
     if (q) {
       where.OR = [
-        { folio: { contains: q, mode: 'insensitive' } },
-        { cliente: { contains: q, mode: 'insensitive' } },
-        { direccion: { contains: q, mode: 'insensitive' } },
-        { telefono: { contains: q, mode: 'insensitive' } },
-        { reporte: { contains: q, mode: 'insensitive' } },
-        { observaciones: { contains: q, mode: 'insensitive' } },
-        { responsable: { contains: q, mode: 'insensitive' } },
+        {
+          folio: {
+            contains: q,
+            mode: 'insensitive',
+          },
+        },
+        {
+          cliente: {
+            contains: q,
+            mode: 'insensitive',
+          },
+        },
+        {
+          direccion: {
+            contains: q,
+            mode: 'insensitive',
+          },
+        },
+        {
+          telefono: {
+            contains: q,
+            mode: 'insensitive',
+          },
+        },
+        {
+          reporte: {
+            contains: q,
+            mode: 'insensitive',
+          },
+        },
+        {
+          observaciones: {
+            contains: q,
+            mode: 'insensitive',
+          },
+        },
+        {
+          responsable: {
+            contains: q,
+            mode: 'insensitive',
+          },
+        },
       ];
     }
 
-    const data = await this.prisma.reportes.findMany({
-      where,
-      orderBy: { id: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    });
+    const data =
+      await this.prisma.reportes.findMany({
+        where,
+        orderBy: {
+          id: 'desc',
+        },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
 
-    const total = await this.prisma.reportes.count({ where });
+    const total =
+      await this.prisma.reportes.count({
+        where,
+      });
 
-    return { data, total, page, pageSize };
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+    };
   }
 
-  async setFolio(folioActual: string, nuevoFolio: string): Promise<Reporte> {
+  async setFolio(
+    folioActual: string,
+    nuevoFolio: string,
+  ): Promise<Reporte> {
     try {
       return await this.prisma.reportes.update({
-        where: { folio: folioActual },
-        data: { folio: nuevoFolio },
-      });
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        throw new ConflictException(`El folio "${nuevoFolio}" ya existe`);
-      }
-      throw error;
-    }
-  }
-
-  async findOne(folio: string): Promise<Reporte | null> {
-    return this.prisma.reportes.findFirst({ where: { folio } });
-  }
-
-  async create(data: Omit<Reporte, 'id'>): Promise<Reporte> {
-    const folio = data.folio?.trim() || await generarFolio(this.prisma);
-
-    try {
-      const reporte = await this.prisma.reportes.create({
+        where: {
+          folio: folioActual,
+        },
         data: {
-          folio,
-          cliente: data.cliente,
-          direccion: data.direccion,
-          telefono: data.telefono,
-          fechaReporte: data.fechaReporte,
-          reporte: data.reporte,
-          observaciones: data.observaciones,
-          evidencias: data.evidencias ?? [],
-          firma: data.firma ?? '',
-          responsable: data.responsable ?? '',
-          fechaReparacion: data.fechaReparacion ?? '',
-          terminado: data.terminado ?? false,
+          folio: nuevoFolio,
         },
       });
-      return reporte;
     } catch (error) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error instanceof
+          Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException(`El folio "${folio}" ya existe`);
+        throw new ConflictException(
+          `El folio "${nuevoFolio}" ya existe`,
+        );
       }
+
       throw error;
     }
   }
 
-  async addEvidencia(folio: string, fileId: string): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
-    if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
-    }
-
-    const evidenciasActuales = reporte.evidencias ?? [];
-    const nuevaLista = [...evidenciasActuales, fileId];
-
-    return this.prisma.reportes.update({
-      where: { folio },
-      data: { evidencias: nuevaLista },
+  async findOne(
+    folio: string,
+  ): Promise<Reporte | null> {
+    return this.prisma.reportes.findFirst({
+      where: {
+        folio,
+      },
     });
   }
 
-  async removeEvidencia(folio: string, fileId: string): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+  async create(
+    data: Omit<Reporte, 'id'>,
+  ): Promise<Reporte> {
+    const folio =
+      data.folio?.trim() ||
+      (await generarFolio(this.prisma));
+
+    try {
+      const reporte =
+        await this.prisma.reportes.create({
+          data: {
+            folio,
+            cliente: data.cliente,
+            direccion: data.direccion,
+            telefono: data.telefono,
+            fechaReporte: data.fechaReporte,
+            reporte: data.reporte,
+
+            observaciones:
+              data.observaciones ?? '',
+
+            evidencias:
+              data.evidencias ?? [],
+
+            firma:
+              data.firma ?? '',
+
+            responsable:
+              data.responsable ?? '',
+
+            fechaReparacion:
+              data.fechaReparacion ?? '',
+
+            terminado:
+              data.terminado ?? false,
+          },
+        });
+
+      return reporte;
+    } catch (error) {
+      console.error(
+        'ERROR AL CREAR REPORTE:',
+        error,
+      );
+
+      if (
+        error instanceof
+          Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException(
+          `El folio "${folio}" ya existe`,
+        );
+      }
+
+      throw error;
+    }
+  }
+
+  async addEvidencia(
+    folio: string,
+    fileId: string,
+  ): Promise<Reporte> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
     }
 
-    const evidenciasActuales = reporte.evidencias ?? [];
-    const nuevaLista = evidenciasActuales.filter((id) => id !== fileId);
+    const evidenciasActuales =
+      reporte.evidencias ?? [];
+
+    const nuevaLista = [
+      ...evidenciasActuales,
+      fileId,
+    ];
 
     return this.prisma.reportes.update({
-      where: { folio },
-      data: { evidencias: nuevaLista },
+      where: {
+        folio,
+      },
+      data: {
+        evidencias: nuevaLista,
+      },
     });
   }
 
-  async addFirma(folio: string, fileId: string): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+  async removeEvidencia(
+    folio: string,
+    fileId: string,
+  ): Promise<Reporte> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
     }
 
+    const evidenciasActuales =
+      reporte.evidencias ?? [];
+
+    const nuevaLista =
+      evidenciasActuales.filter(
+        (id) => id !== fileId,
+      );
+
     return this.prisma.reportes.update({
-      where: { folio },
-      data: { firma: fileId, terminado: true },
+      where: {
+        folio,
+      },
+      data: {
+        evidencias: nuevaLista,
+      },
     });
   }
 
-  async setFechaReparacion(folio: string, fecha: string): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+  async addFirma(
+    folio: string,
+    fileId: string,
+  ): Promise<Reporte> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
     }
 
     return this.prisma.reportes.update({
-      where: { folio },
-      data: { fechaReparacion: fecha },
+      where: {
+        folio,
+      },
+      data: {
+        firma: fileId,
+        terminado: true,
+      },
+    });
+  }
+
+  async setFechaReparacion(
+    folio: string,
+    fecha: string,
+  ): Promise<Reporte> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
+    if (!reporte) {
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
+    }
+
+    return this.prisma.reportes.update({
+      where: {
+        folio,
+      },
+      data: {
+        fechaReparacion: fecha,
+      },
     });
   }
 
@@ -190,55 +362,120 @@ export class ReportesService {
     folio: string,
     observaciones: string,
   ): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
     }
 
     return this.prisma.reportes.update({
-      where: { folio },
-      data: { observaciones },
+      where: {
+        folio,
+      },
+      data: {
+        observaciones,
+      },
     });
   }
 
-  async setTelefono(folio: string, telefono: string): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+  async setTelefono(
+    folio: string,
+    telefono: string,
+  ): Promise<Reporte> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
     }
 
     return this.prisma.reportes.update({
-      where: { folio },
-      data: { telefono },
+      where: {
+        folio,
+      },
+      data: {
+        telefono,
+      },
     });
   }
 
-  async setResponsable(folio: string, responsable: string): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+  async setResponsable(
+    folio: string,
+    responsable: string,
+  ): Promise<Reporte> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
     }
 
     return this.prisma.reportes.update({
-      where: { folio },
-      data: { responsable },
+      where: {
+        folio,
+      },
+      data: {
+        responsable,
+      },
     });
   }
 
-  async getFirma(folio: string): Promise<string | null> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+  async getFirma(
+    folio: string,
+  ): Promise<string | null> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     return reporte?.firma ?? null;
   }
 
-  async removeFirma(folio: string): Promise<Reporte> {
-    const reporte = await this.prisma.reportes.findFirst({ where: { folio } });
+  async removeFirma(
+    folio: string,
+  ): Promise<Reporte> {
+    const reporte =
+      await this.prisma.reportes.findFirst({
+        where: {
+          folio,
+        },
+      });
+
     if (!reporte) {
-      throw new NotFoundException(`No existe un reporte con folio "${folio}"`);
+      throw new NotFoundException(
+        `No existe un reporte con folio "${folio}"`,
+      );
     }
 
     return this.prisma.reportes.update({
-      where: { folio },
-      data: { firma: '', terminado: false },
+      where: {
+        folio,
+      },
+      data: {
+        firma: '',
+        terminado: false,
+      },
     });
   }
 }
