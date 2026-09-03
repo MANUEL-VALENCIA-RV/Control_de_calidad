@@ -184,11 +184,11 @@ export default function Reportes() {
     <div className="flex min-h-full flex-1 flex-col">
       <AppHeader />
 
-      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-5 px-4 py-5 md:px-6">
+      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-4 px-3 py-4 sm:gap-5 sm:px-4 sm:py-5 md:px-6">
         {/* Encabezado */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold text-foreground">
+            <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
               Reportes de reparación
             </h1>
 
@@ -197,14 +197,14 @@ export default function Reportes() {
             </p>
           </div>
 
-          <Button onClick={() => setDialogOpen(true)}>
+          <Button onClick={() => setDialogOpen(true)} className="w-full sm:w-auto">
             <Plus className="size-4" />
             Nuevo reporte
           </Button>
         </div>
 
-        <Card className="border-none bg-gradient-to-b from-[#1d2f5e] via-[#16233f] to-[#101a30] shadow-[0_8px_40px_rgba(2,0,52,0.35)]">
-          <CardHeader className="gap-4 px-5 pt-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+        <Card className="overflow-hidden border-none bg-gradient-to-b from-[#1d2f5e] via-[#16233f] to-[#101a30] shadow-[0_8px_40px_rgba(2,0,52,0.35)]">
+          <CardHeader className="gap-4 px-4 pt-4 sm:px-5 sm:pt-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
             <div className="flex min-w-0 flex-col gap-0.5">
               <CardTitle>
                 Viviendas y Desarrollo de Teziutlán
@@ -233,7 +233,7 @@ export default function Reportes() {
               </div>
 
               {/* Filtros */}
-              <div className="flex items-center gap-1 self-start rounded-lg bg-white/[0.06] p-1 md:self-auto">
+              <div className="flex w-full items-center gap-1 overflow-x-auto rounded-lg bg-white/[0.06] p-1 md:w-auto md:self-auto">
                 {statusOptions.map((option) => (
                   <button
                     key={option.value}
@@ -242,7 +242,7 @@ export default function Reportes() {
                       setStatus(option.value);
                       setPage(1);
                     }}
-                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-100 ${
+                    className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-100 ${
                       status === option.value
                         ? "bg-background text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
@@ -302,7 +302,7 @@ export default function Reportes() {
               </div>
             ) : (
               <>
-                <div className="w-full overflow-x-auto overscroll-x-contain">
+                <div className="w-full overflow-x-auto overscroll-x-contain touch-pan-x [-webkit-overflow-scrolling:touch]">
                   <Table className="min-w-[1850px] table-fixed">
                     <colgroup>
                       <col className="w-[200px]" />
@@ -525,17 +525,18 @@ export default function Reportes() {
                 </div>
 
                 {/* Paginación */}
-                <div className="flex flex-col gap-3 border-t border-white/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 border-t border-white/10 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
                   <p className="text-xs text-muted-foreground tabular-nums">
                     Mostrando {startItem}–{endItem} de {total}{" "}
                     reportes
                   </p>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex w-full items-center gap-2 sm:w-auto">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
+                      className="flex-1 sm:flex-none"
                       onClick={() =>
                         setPage(safePage - 1)
                       }
@@ -545,7 +546,7 @@ export default function Reportes() {
                       Anterior
                     </Button>
 
-                    <span className="px-2 text-xs text-muted-foreground tabular-nums">
+                    <span className="shrink-0 px-1 text-center text-[11px] text-muted-foreground tabular-nums sm:px-2 sm:text-xs">
                       Página {safePage} de {pageCount}
                     </span>
 
@@ -553,6 +554,7 @@ export default function Reportes() {
                       type="button"
                       variant="outline"
                       size="sm"
+                      className="flex-1 sm:flex-none"
                       onClick={() =>
                         setPage(safePage + 1)
                       }

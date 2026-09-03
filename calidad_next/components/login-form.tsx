@@ -75,8 +75,8 @@ export function LoginForm({
       className={cn("flex flex-col gap-6", className)}
       {...props}
     >
-      <Card>
-        <CardHeader>
+      <Card className="shadow-lg">
+        <CardHeader className="px-5 pt-5 sm:px-6 sm:pt-6">
           <CardTitle>Iniciar sesión</CardTitle>
 
           <CardDescription>
@@ -84,7 +84,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6">
           <form onSubmit={submit}>
             <FieldGroup>
               <Field>

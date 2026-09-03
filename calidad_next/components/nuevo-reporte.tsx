@@ -90,11 +90,11 @@ export function NuevoReporte({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 sm:p-4"
       onMouseDown={closeModal}
     >
       <div
-        className="w-full max-w-lg rounded-xl border bg-background p-5 shadow-2xl"
+        className="max-h-[92svh] w-full max-w-lg overflow-y-auto rounded-xl border bg-background p-4 shadow-2xl sm:p-5"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <h2 className="mb-4 text-lg font-semibold">Nuevo reporte</h2>
@@ -159,12 +159,12 @@ export function NuevoReporte({
             <p className="text-sm text-destructive sm:col-span-2">{error}</p>
           )}
 
-          <div className="flex justify-end gap-2 sm:col-span-2">
-            <Button type="button" variant="outline" onClick={closeModal}>
+          <div className="flex flex-col-reverse gap-2 sm:col-span-2 sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" onClick={closeModal} className="w-full sm:w-auto">
               Cancelar
             </Button>
 
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving} className="w-full sm:w-auto">
               {saving ? "Guardando..." : "Guardar"}
             </Button>
           </div>

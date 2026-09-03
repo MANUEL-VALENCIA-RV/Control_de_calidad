@@ -38,7 +38,7 @@ function StatCard({
 }) {
     return (
         <Card className="overflow-hidden">
-            <CardContent className="flex items-center gap-4 p-5">
+            <CardContent className="flex items-center gap-3 p-4 sm:gap-4 sm:p-5">
                 <div
                     className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${tone}`}
                 >
@@ -225,11 +225,11 @@ export default function Dashboard() {
         <div className="flex min-h-full flex-1 flex-col">
             <AppHeader />
 
-            <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-5 px-4 py-5 md:px-6">
+            <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-4 px-3 py-4 sm:gap-5 sm:px-4 sm:py-5 md:px-6">
                 {/* Encabezado */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-3xl font-semibold text-foreground">
+                        <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
                             Centro de control
                         </h1>
 
@@ -240,7 +240,7 @@ export default function Dashboard() {
                         </p>
                     </div>
 
-                    <Button asChild>
+                    <Button asChild className="w-full sm:w-auto">
                         <Link href="/control/reportes">
                             Ver reportes
                             <ArrowRight />
@@ -265,6 +265,7 @@ export default function Dashboard() {
                                 type="button"
                                 variant="outline"
                                 size="sm"
+                                className="w-full sm:w-auto"
                                 onClick={load}
                             >
                                 Intentar de nuevo
@@ -276,7 +277,7 @@ export default function Dashboard() {
                 {/* Estadísticas */}
                 <section
                     aria-label="Indicadores principales"
-                    className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+                    className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4"
                 >
                     {stats.map((stat) => (
                         <StatCard
@@ -302,13 +303,13 @@ export default function Dashboard() {
 
                         <CardContent className="flex flex-col items-center justify-center gap-8 pt-2">
                             {loading ? (
-                                <div className="flex size-72 items-center justify-center">
+                                <div className="flex size-56 items-center justify-center sm:size-64 md:size-72">
                                     <span className="text-sm text-muted-foreground">
                                         Cargando datos...
                                     </span>
                                 </div>
                             ) : (
-                                <div className="relative size-72">
+                                <div className="relative size-56 sm:size-64 md:size-72">
                                     <svg
                                         viewBox="0 0 100 100"
                                         className="size-full -rotate-90"
@@ -366,7 +367,7 @@ export default function Dashboard() {
                                     </svg>
 
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-3xl font-semibold text-foreground">
+                                        <span className="text-2xl font-semibold text-foreground sm:text-3xl">
                                             {total}
                                         </span>
 
@@ -377,7 +378,7 @@ export default function Dashboard() {
                                 </div>
                             )}
 
-                            <div className="grid w-full max-w-sm grid-cols-2 gap-3">
+                            <div className="grid w-full max-w-sm grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
                                 <div className="flex items-center justify-between rounded-lg bg-white/[0.03] px-4 py-3">
                                     <div className="flex items-center gap-2.5">
                                         <span className="size-3 rounded-full bg-[var(--chart-2)]" />
@@ -415,7 +416,7 @@ export default function Dashboard() {
 
                     {/* Reportes pendientes */}
                     <Card className="flex flex-col">
-                        <CardHeader className="flex flex-row items-center justify-between">
+                        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex min-w-0 flex-col gap-0.5">
                                 <CardTitle>
                                     Reportes pendientes
@@ -432,6 +433,7 @@ export default function Dashboard() {
                                 asChild
                                 variant="outline"
                                 size="sm"
+                                className="w-full sm:w-auto"
                             >
                                 <Link href="/control/reportes">
                                     Ver todos
