@@ -249,6 +249,12 @@ export class ReportesService {
     const evidenciasActuales =
       reporte.evidencias ?? [];
 
+    if (!evidenciasActuales.includes(fileId)) {
+      throw new NotFoundException(
+        'La evidencia no pertenece a este reporte',
+      );
+    }
+
     const nuevaLista =
       evidenciasActuales.filter(
         (fid) => fid !== fileId,
@@ -398,6 +404,24 @@ export class ReportesService {
         responsable,
       },
     });
+  }
+
+  async archivoPerteneceAReporte(fileId: string): Promise<boolean> {
+    if (!fileId) {
+      return false;
+    }
+
+    const reporte = await this.prisma.reportes.findFirst({
+      where: {
+        OR: [
+          { evidencias: { has: fileId } },
+          { firma: fileId },
+        ],
+      },
+      select: { id: true },
+    });
+
+    return Boolean(reporte);
   }
 
   async getFirma(

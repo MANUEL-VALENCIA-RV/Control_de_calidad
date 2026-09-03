@@ -101,7 +101,7 @@ export async function GET(
             "Content-Disposition":
               cached.contentDisposition,
             "Cache-Control":
-              "public, max-age=86400",
+              "private, no-store, max-age=0",
             "X-Cache": "HIT",
           },
         },
@@ -189,7 +189,7 @@ export async function GET(
           "Content-Length":
             buffer.length.toString(),
           "Cache-Control":
-            "public, max-age=86400",
+            "private, no-store, max-age=0",
           "X-Cache": "MISS",
         },
       },

@@ -38,7 +38,7 @@ export async function GET(
     const { fileId } = await params;
 
     const headers = {
-        "Cache-Control": "public, max-age=86400",
+        "Cache-Control": "private, no-store, max-age=0",
         "Content-Disposition": "inline",
     } as Record<string, string>;
 

@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -19,6 +20,15 @@ import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/m
 import { ReportesService, type Reporte } from './reportes.service';
 import { DriveService } from '../drive/drive.service';
 
+const ALLOWED_IMAGE_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/heic',
+  'image/heif',
+]);
+
 const UPLOAD_OPTIONS: MulterOptions = {
   limits: {
     fileSize: 10 * 1024 * 1024,
@@ -26,17 +36,57 @@ const UPLOAD_OPTIONS: MulterOptions = {
   },
 
   fileFilter: (_req, file, callback) => {
-    if (file.mimetype.startsWith('image/')) {
+    if (ALLOWED_IMAGE_MIME_TYPES.has(file.mimetype.toLowerCase())) {
       callback(null, true);
       return;
     }
 
     callback(
-      new BadRequestException('Solo se permiten archivos de imagen'),
+      new BadRequestException(
+        'Solo se permiten imágenes JPG, PNG, WEBP, GIF, HEIC o HEIF',
+      ),
       false,
     );
   },
 };
+
+function hasRealImageSignature(file: Express.Multer.File): boolean {
+  const bytes = file.buffer;
+
+  if (!bytes || bytes.length < 12) {
+    return false;
+  }
+
+  const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const isPng =
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a;
+  const isGif = bytes.subarray(0, 6).toString('ascii') === 'GIF87a' ||
+    bytes.subarray(0, 6).toString('ascii') === 'GIF89a';
+  const isWebp =
+    bytes.subarray(0, 4).toString('ascii') === 'RIFF' &&
+    bytes.subarray(8, 12).toString('ascii') === 'WEBP';
+  const brand = bytes.subarray(8, 12).toString('ascii');
+  const isHeif =
+    bytes.subarray(4, 8).toString('ascii') === 'ftyp' &&
+    ['heic', 'heix', 'hevc', 'hevx', 'mif1', 'msf1'].includes(brand);
+
+  return isJpeg || isPng || isGif || isWebp || isHeif;
+}
+
+function assertSafeImage(file: Express.Multer.File): void {
+  if (!hasRealImageSignature(file)) {
+    throw new BadRequestException(
+      'El archivo no contiene una imagen válida',
+    );
+  }
+}
 
 @Controller('reportes')
 export class ReportesController {
@@ -86,6 +136,8 @@ export class ReportesController {
       throw new BadRequestException('El archivo es obligatorio');
     }
 
+    assertSafeImage(file);
+
     const fileId = await this.driveService.uploadFile(file);
 
     try {
@@ -116,6 +168,13 @@ export class ReportesController {
     @Param('fileId') fileId: string,
     @Res() res: Response,
   ) {
+    const perteneceAReporte =
+      await this.reportesService.archivoPerteneceAReporte(fileId);
+
+    if (!perteneceAReporte) {
+      throw new NotFoundException('Archivo no asociado a ningún reporte');
+    }
+
     const file = await this.driveService.downloadFile(fileId);
 
     res.setHeader('Content-Type', file.mimeType);
@@ -125,7 +184,8 @@ export class ReportesController {
       `inline; filename="${file.name}"`,
     );
 
-    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
 
     res.send(file.buffer);
   }
@@ -157,7 +217,8 @@ export class ReportesController {
       `inline; filename="${file.name}"`,
     );
 
-    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
 
     res.send(file.buffer);
   }
@@ -172,6 +233,8 @@ export class ReportesController {
     if (!file) {
       throw new BadRequestException('El archivo es obligatorio');
     }
+
+    assertSafeImage(file);
 
     const fileId = await this.driveService.uploadFile(file);
 
