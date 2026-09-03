@@ -5,7 +5,9 @@ import {
   LoaderCircle,
   PenLine,
   Trash2,
+  X,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import { deleteFirma } from "@/lib/reports";
 import type { ReportRow } from "@/lib/reports";
@@ -27,9 +29,11 @@ export function FirmaUpload({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hovered, setHovered] = useState(false);
-const firmaUrl = firma
-  ? `/api/evidencias/${encodeURIComponent(firma)}`
-  : "";
+  const [viewerOpen, setViewerOpen] = useState(false);
+
+  const firmaUrl = firma
+    ? `/api/evidencias/${encodeURIComponent(firma)}`
+    : "";
 
   async function change(
     e: ChangeEvent<HTMLInputElement>,
@@ -95,6 +99,7 @@ const firmaUrl = firma
           id,
         )) as ReportRow;
 
+      setViewerOpen(false);
       onUpdated(id, row);
     } catch (err) {
       setError(
@@ -131,6 +136,7 @@ const firmaUrl = firma
             {/* Miniatura visible */}
             <button
               type="button"
+              onClick={() => setViewerOpen(true)}
               className="
                 flex
                 h-12
@@ -146,7 +152,7 @@ const firmaUrl = firma
                 hover:border-white/20
                 hover:bg-white/10
               "
-              aria-label="Vista previa de firma"
+              aria-label="Abrir firma"
             >
               <img
                 src={firmaUrl}
@@ -160,8 +166,8 @@ const firmaUrl = firma
               />
             </button>
 
-            {/* Vista previa grande */}
-            {hovered && (
+            {/* Vista previa al pasar el mouse */}
+            {hovered && !viewerOpen && (
               <div
                 className="
                   pointer-events-none
@@ -239,6 +245,53 @@ const firmaUrl = firma
               <Trash2 className="size-3" />
             )}
           </button>
+
+          {/* Vista completa al hacer click */}
+          {viewerOpen &&
+            createPortal(
+              <div
+                className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4"
+                onMouseDown={() => setViewerOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setViewerOpen(false)}
+                  className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                  aria-label="Cerrar firma"
+                >
+                  <X className="size-5" />
+                </button>
+
+                <div
+                  className="flex max-h-[85vh] max-w-[90vw] items-center justify-center"
+                  onMouseDown={(event) => event.stopPropagation()}
+                >
+                  <img
+                    src={firmaUrl}
+                    alt="Firma"
+                    className="max-h-[85vh] max-w-[85vw] rounded-lg bg-white/5 p-2 object-contain"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void remove();
+                  }}
+                  disabled={loading}
+                  className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-destructive/20 p-2 text-destructive transition-colors hover:bg-destructive/30 disabled:opacity-50"
+                  aria-label="Eliminar firma"
+                >
+                  {loading ? (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-4" />
+                  )}
+                </button>
+              </div>,
+              document.body,
+            )}
         </>
       ) : (
         <>
